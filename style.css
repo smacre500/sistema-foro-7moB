@@ -1,0 +1,27 @@
+:root { --navy:#16324f; --blue:#2864a5; --pale:#f1f5f9; --ink:#243447; --muted:#718096; --line:#e2e8f0; }
+    * { box-sizing:border-box; }
+    body { margin:0; background:var(--pale); color:var(--ink); font:16px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif; }
+    header { background:var(--navy); color:white; padding:18px max(22px,calc((100% - 1100px)/2)); display:flex; align-items:center; gap:24px; }
+    header h1 { font-size:21px; margin:0; white-space:nowrap; }
+    header input { width:min(460px,50vw); border:0; border-radius:9px; padding:11px 14px; font:inherit; }
+    .layout { max-width:1100px; margin:28px auto; padding:0 18px; display:grid; grid-template-columns:245px minmax(0,1fr); gap:22px; }
+    .panel,.post { background:white; border:1px solid var(--line); border-radius:13px; box-shadow:0 3px 12px #16324f0a; }
+    aside { padding:20px; height:max-content; }
+    .avatar { width:62px; height:62px; border-radius:50%; background:#dbeafe; color:var(--blue); display:grid; place-items:center; font-size:24px; font-weight:700; margin-bottom:12px; }
+    aside h2 { font-size:18px; margin:0; } .muted { color:var(--muted); font-size:14px; }
+    nav { display:grid; gap:7px; margin-top:22px; } nav a { text-decoration:none; color:var(--ink); padding:9px 10px; border-radius:8px; } nav a:first-child,nav a:hover { background:#edf4fc; color:var(--blue); }
+    main { display:grid; gap:16px; }
+    .composer { padding:18px; } .composer h2 { margin:0 0 12px; font-size:18px; }
+    textarea { width:100%; min-height:78px; resize:vertical; border:1px solid var(--line); border-radius:9px; padding:12px; font:inherit; }
+    .compose-actions { display:flex; justify-content:space-between; align-items:center; gap:12px; margin-top:10px; }
+    button { border:0; border-radius:8px; padding:9px 14px; background:var(--blue); color:white; font:inherit; font-weight:600; cursor:pointer; }
+    .post { padding:19px; } .post-head { display:flex; align-items:center; gap:11px; }
+    .mini-avatar { width:42px; height:42px; border-radius:50%; background:#e8edf4; display:grid; place-items:center; font-weight:700; color:var(--navy); }
+    .post-head strong { display:block; } .post h3 { margin:16px 0 5px; font-size:18px; } .post p { margin:8px 0 15px; }
+    .post-actions { border-top:1px solid var(--line); padding-top:12px; display:flex; gap:18px; color:var(--muted); font-size:14px; }
+    .post-actions button { background:none; color:var(--blue); padding:0; font-weight:600; }
+    .comment { margin-top:14px; background:#f7f9fc; border-radius:9px; padding:11px 13px; font-size:14px; }
+    .comment-form { display:flex; gap:8px; margin-top:12px; } .comment-form input { flex:1; min-width:0; border:1px solid var(--line); border-radius:8px; padding:9px 11px; font:inherit; }
+    @media(max-width:700px) { header { flex-wrap:wrap; gap:12px; } header input { order:3; width:100%; } .layout { grid-template-columns:1fr; margin-top:16px; } aside { display:flex; align-items:center; gap:14px; } aside nav { display:flex; flex-wrap:wrap; margin:0 0 0 auto; } aside .avatar { margin:0; flex:none; } }
+    @media(max-width:450px) { aside { flex-wrap:wrap; } aside nav { width:100%; margin:0; } .compose-actions { align-items:flex-start; flex-direction:column; } }
+
