@@ -23,6 +23,25 @@ function consulta($sql, $parametros = []) {
     return $stmt;
 }
 
+function campo($datos, $nombre, $minimo, $maximo) {
+    $valor = $datos[$nombre] ?? '';
+    if (!is_string($valor)) {
+        error("El campo $nombre debe ser texto.");
+    }
+    $valor = trim($valor);
+    if (mb_strlen($valor) < $minimo || mb_strlen($valor) > $maximo) {
+        error("Revisá el campo $nombre (entre $minimo y $maximo caracteres).");
+    }
+    return $valor;
+}
+
+function id($valor) {
+    if (is_array($valor) || !filter_var($valor, FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]])) {
+        error('Identificador inválido.');
+    }
+    return (int) $valor;
+}
+
 function correoInstitucional($correo) {
     return filter_var($correo, FILTER_VALIDATE_EMAIL) &&
         strrchr(strtolower($correo), '@') === '@obralapiedad.com.ar';
