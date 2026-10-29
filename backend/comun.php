@@ -85,6 +85,23 @@ function requerirGet() {
     }
 }
 
+function datosPost() {
+    if (($_SERVER['REQUEST_METHOD'] ?? '') != 'POST') {
+        error('Método no permitido.', 405);
+    }
+    if ((int) ($_SERVER['CONTENT_LENGTH'] ?? 0) > 20000) {
+        error('El contenido es demasiado grande.', 413);
+    }
+    if (!hash_equals($_SESSION['csrf'], $_SERVER['HTTP_X_CSRF_TOKEN'] ?? '')) {
+        error('Recargá la página y volvé a intentarlo.', 419);
+    }
+    $datos = json_decode(file_get_contents('php://input'), true);
+    if (!is_array($datos)) {
+        error('Datos inválidos.');
+    }
+    return $datos;
+}
+
 set_exception_handler(function ($e) {
     global $pdo;
     if ($pdo && $pdo->inTransaction()) {
