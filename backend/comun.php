@@ -79,6 +79,14 @@ function usuarioActual($obligatorio = false) {
     return $usuario;
 }
 
+function administrador() {
+    $usuario = usuarioActual(true);
+    if ($usuario['rol'] != 'administrador') {
+        error('Solo los administradores pueden realizar esta acción.', 403);
+    }
+    return $usuario;
+}
+
 function requerirGet() {
     if (($_SERVER['REQUEST_METHOD'] ?? 'GET') != 'GET') {
         error('Método no permitido.', 405);
