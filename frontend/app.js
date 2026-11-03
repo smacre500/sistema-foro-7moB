@@ -236,6 +236,12 @@ $('#cancelar-edicion').addEventListener('click', () => {
     $('#crear-publicacion').hidden = true;
 });
 
+guardarFormulario('#form-perfil', async (datos) => {
+    await api('perfil_guardar', datos);
+    mensaje('Perfil actualizado.');
+    await iniciar();
+});
+
 document.addEventListener('click', async (evento) => {
     const boton = evento.target.closest('[data-accion]');
     if (!boton || boton.disabled) return;
@@ -376,10 +382,21 @@ async function navegar() {
             location.hash = '#inicio';
             throw new Error('Iniciá sesión para ver tu perfil.');
         }
+
+        const datos = await api('perfil', null, { id: identificador });
+        const perfil = datos.perfil;
         estado.autor = Number(identificador);
-        $('#datos-perfil').innerHTML = '<p class="secundario">Cargando perfil…</p>';
-        $('#editar-perfil').hidden = true;
-        $('#publicaciones-perfil').innerHTML = '<p class="secundario">Cargando publicaciones…</p>';
+
+        $('#datos-perfil').innerHTML = `<h1>${escapar(perfil.nombre)}</h1><p class="secundario">@${escapar(perfil.nombre_usuario)}</p><p class="contenido">${escapar(perfil.biografia || 'Sin descripción.')}</p><small class="secundario">Miembro desde ${escapar(fecha(perfil.fecha_registro))}</small>`;
+
+        const propio = Number(estado.usuario?.id_usuario) === Number(identificador);
+        $('#editar-perfil').hidden = !propio;
+        if (propio) {
+            $('#form-perfil').elements.nombre.value = perfil.nombre;
+            $('#form-perfil').elements.biografia.value = perfil.biografia;
+        }
+
+        await cargarPublicaciones(estado.autor);
     } else {
         await cargarPublicaciones();
     }
