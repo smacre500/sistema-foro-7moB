@@ -190,6 +190,21 @@ guardarFormulario('#form-acceso', async (datos, formulario) => {
     await iniciar();
 });
 
+$('#salir').addEventListener('click', async () => {
+    const boton = $('#salir');
+    boton.disabled = true;
+    try {
+        await api('salir', {});
+        location.hash = '#inicio';
+        mensaje('Cerraste sesión.');
+        await iniciar();
+    } catch (error) {
+        mensaje(error.message, true);
+    } finally {
+        boton.disabled = false;
+    }
+});
+
 async function iniciar() {
     const datos = await api('inicio');
     estado.usuario = datos.usuario;
