@@ -6,6 +6,7 @@ const $ = (selector) => document.querySelector(selector);
 const estado = {
     usuario: null,
     csrf: '',
+    registro: false,
     publicaciones: [],
     usuarios: [],
     autor: 0
@@ -111,6 +112,83 @@ function actualizarCuenta() {
     $('#avatar-perfil').textContent = iniciales(usuario?.nombre);
     $('#avatar-compositor').textContent = iniciales(usuario?.nombre);
 }
+
+function guardarFormulario(selector, tarea) {
+    $(selector).addEventListener('submit', async (evento) => {
+        evento.preventDefault();
+        const formulario = evento.currentTarget;
+        const boton = formulario.querySelector('[type="submit"]');
+        if (boton.disabled) return;
+
+        boton.disabled = true;
+        try {
+            await tarea(Object.fromEntries(new FormData(formulario)), formulario);
+        } catch (error) {
+            if (formulario.id === 'form-acceso') {
+                $('#error-acceso').textContent = error.message;
+            } else {
+                mensaje(error.message, true);
+            }
+        } finally {
+            boton.disabled = false;
+        }
+    });
+}
+
+function prepararAcceso(registro) {
+    estado.registro = registro;
+    $('#error-acceso').textContent = '';
+    $('#campos-registro').hidden = !registro;
+    $('#campo-identidad').hidden = registro;
+
+    document.querySelectorAll('#campos-registro input').forEach((input) => {
+        input.disabled = !registro;
+        input.required = registro;
+    });
+
+    const identidad = $('#form-acceso').elements.identidad;
+    const contrasena = $('#form-acceso').elements.contrasena;
+    identidad.disabled = registro;
+    identidad.required = !registro;
+    contrasena.minLength = registro ? 10 : 1;
+    contrasena.autocomplete = registro ? 'new-password' : 'current-password';
+
+    $('#titulo-acceso').textContent = registro ? 'Crear cuenta' : 'Iniciar sesión';
+    $('#boton-acceso').textContent = registro ? 'Registrarme' : 'Ingresar';
+    $('#cambiar-acceso').textContent = registro ? 'Ya tengo una cuenta' : 'Crear una cuenta';
+    validarCorreo();
+}
+
+function abrirAcceso(registro = false) {
+    prepararAcceso(registro);
+    if (!$('#acceso').open) $('#acceso').showModal();
+}
+
+function validarCorreo() {
+    const correo = $('#form-acceso').elements.correo;
+    correo.setCustomValidity(
+        correo.value && !/^[^\s@]+@obralapiedad\.com\.ar$/i.test(correo.value)
+            ? 'Usá un correo terminado exactamente en @obralapiedad.com.ar.'
+            : ''
+    );
+}
+
+$('#ingresar').addEventListener('click', () => abrirAcceso(false));
+$('#registrarse').addEventListener('click', () => abrirAcceso(true));
+$('#cerrar-acceso').addEventListener('click', () => $('#acceso').close());
+$('#cambiar-acceso').addEventListener('click', () => prepararAcceso(!estado.registro));
+$('#form-acceso').elements.correo.addEventListener('input', validarCorreo);
+$('#acceso').addEventListener('close', () => {
+    $('#form-acceso').elements.contrasena.value = '';
+    $('#error-acceso').textContent = '';
+});
+
+guardarFormulario('#form-acceso', async (datos, formulario) => {
+    await api(estado.registro ? 'registro' : 'login', datos);
+    formulario.reset();
+    mensaje(estado.registro ? 'Tu cuenta fue creada.' : 'Ingresaste al foro.');
+    await iniciar();
+});
 
 async function iniciar() {
     const datos = await api('inicio');
