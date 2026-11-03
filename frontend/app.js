@@ -205,6 +205,77 @@ $('#salir').addEventListener('click', async () => {
     }
 });
 
+document.querySelectorAll('.abrir-publicacion').forEach((boton) =>
+    boton.addEventListener('click', () => {
+        if (!estado.usuario) {
+            abrirAcceso(false);
+            return;
+        }
+        location.hash = '#inicio';
+        $('#crear-publicacion').hidden = false;
+        $('#form-publicacion').elements.titulo.focus();
+    })
+);
+
+guardarFormulario('#form-publicacion', async (datos, formulario) => {
+    await api('publicar', datos);
+    formulario.reset();
+    formulario.elements.id_publicacion.value = '';
+    $('#titulo-editor').textContent = 'Crear publicación';
+    $('#cancelar-edicion').hidden = true;
+    $('#crear-publicacion').hidden = true;
+    mensaje('Publicación guardada.');
+    await cargarPublicaciones();
+});
+
+$('#cancelar-edicion').addEventListener('click', () => {
+    $('#form-publicacion').reset();
+    $('#form-publicacion').elements.id_publicacion.value = '';
+    $('#titulo-editor').textContent = 'Crear publicación';
+    $('#cancelar-edicion').hidden = true;
+    $('#crear-publicacion').hidden = true;
+});
+
+document.addEventListener('click', async (evento) => {
+    const boton = evento.target.closest('[data-accion]');
+    if (!boton || boton.disabled) return;
+
+    const accion = boton.dataset.accion;
+    const identificador = Number(boton.dataset.id);
+    boton.disabled = true;
+
+    try {
+        if (accion === 'editar-publicacion') {
+            const publicacion = estado.publicaciones.find(
+                (elemento) => Number(elemento.id_publicacion) === identificador
+            );
+            if (!publicacion) return;
+
+            location.hash = '#inicio';
+            $('#crear-publicacion').hidden = false;
+            const formulario = $('#form-publicacion');
+            ['id_publicacion', 'titulo', 'contenido', 'id_categoria'].forEach((campo) => {
+                formulario.elements[campo].value = publicacion[campo];
+            });
+            $('#titulo-editor').textContent = 'Editar publicación';
+            $('#cancelar-edicion').hidden = false;
+            formulario.elements.titulo.focus();
+        } else if (accion.startsWith('eliminar-')) {
+            if (confirm('¿Querés eliminar este contenido?')) {
+                await api('eliminar', {
+                    tipo: accion.replace('eliminar-', ''),
+                    id: identificador
+                });
+                await cargarPublicaciones(estado.autor);
+            }
+        }
+    } catch (error) {
+        mensaje(error.message, true);
+    } finally {
+        boton.disabled = false;
+    }
+});
+
 function dibujarPublicacion(publicacion) {
     const identificador = Number(publicacion.id_publicacion);
     const comentarios = (publicacion.comentarios || [])
@@ -217,7 +288,7 @@ function dibujarPublicacion(publicacion) {
     return `<article class="tarjeta">
         <div class="cabecera-publicacion"><div class="avatar" aria-hidden="true">${escapar(iniciales(publicacion.nombre))}</div><div class="datos-autor"><a href="#perfil/${Number(publicacion.id_autor)}">${escapar(publicacion.nombre)}</a><small class="secundario">@${escapar(publicacion.nombre_usuario)} · ${escapar(fecha(publicacion.fecha_publicacion))}</small></div><span class="categoria">${escapar(publicacion.categoria)}</span></div>
         <h3>${escapar(publicacion.titulo)}</h3><p class="contenido">${escapar(publicacion.contenido)}</p>
-        <div class="acciones pie-publicacion"><button class="me-gusta ${Number(publicacion.mi_like) ? 'activo' : ''}" aria-pressed="${Boolean(Number(publicacion.mi_like))}">♡ Me gusta (${Number(publicacion.likes)})</button></div>
+        <div class="acciones pie-publicacion"><button class="me-gusta ${Number(publicacion.mi_like) ? 'activo' : ''}" aria-pressed="${Boolean(Number(publicacion.mi_like))}">♡ Me gusta (${Number(publicacion.likes)})</button>${esPropio(publicacion) ? `<button class="enlace" data-accion="editar-publicacion" data-id="${identificador}">Editar</button>` : ''}${esPropio(publicacion) || esAdmin() ? `<button class="enlace" data-accion="eliminar-publicacion" data-id="${identificador}">Eliminar</button>` : ''}</div>
         <details><summary>Comentarios (${(publicacion.comentarios || []).length})</summary>${comentarios || '<p class="secundario">Todavía no hay comentarios.</p>'}</details>
     </article>`;
 }
