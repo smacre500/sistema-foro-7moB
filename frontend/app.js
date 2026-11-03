@@ -205,6 +205,77 @@ $('#salir').addEventListener('click', async () => {
     }
 });
 
+function dibujarPublicacion(publicacion) {
+    const identificador = Number(publicacion.id_publicacion);
+    const comentarios = (publicacion.comentarios || [])
+        .map(
+            (comentario) =>
+                `<div class="comentario"><strong>${escapar(comentario.nombre)}</strong><p class="contenido">${escapar(comentario.contenido)}</p></div>`
+        )
+        .join('');
+
+    return `<article class="tarjeta">
+        <div class="cabecera-publicacion"><div class="avatar" aria-hidden="true">${escapar(iniciales(publicacion.nombre))}</div><div class="datos-autor"><a href="#perfil/${Number(publicacion.id_autor)}">${escapar(publicacion.nombre)}</a><small class="secundario">@${escapar(publicacion.nombre_usuario)} · ${escapar(fecha(publicacion.fecha_publicacion))}</small></div><span class="categoria">${escapar(publicacion.categoria)}</span></div>
+        <h3>${escapar(publicacion.titulo)}</h3><p class="contenido">${escapar(publicacion.contenido)}</p>
+        <div class="acciones pie-publicacion"><button class="me-gusta ${Number(publicacion.mi_like) ? 'activo' : ''}" aria-pressed="${Boolean(Number(publicacion.mi_like))}">♡ Me gusta (${Number(publicacion.likes)})</button></div>
+        <details><summary>Comentarios (${(publicacion.comentarios || []).length})</summary>${comentarios || '<p class="secundario">Todavía no hay comentarios.</p>'}</details>
+    </article>`;
+}
+
+async function cargarPublicaciones(autor = 0) {
+    const datos = await api('publicaciones', null, {
+        buscar: autor ? '' : $('#buscar').value.trim(),
+        autor
+    });
+    estado.publicaciones = datos.publicaciones;
+
+    const contenedor = autor ? '#publicaciones-perfil' : '#publicaciones';
+    $(contenedor).innerHTML =
+        datos.publicaciones.map(dibujarPublicacion).join('') ||
+        '<div class="tarjeta vacio">No hay publicaciones para mostrar.</div>';
+
+    if (!autor) {
+        $('#cantidad-publicaciones').textContent = `${datos.publicaciones.length} publicaciones en este espacio`;
+        $('#total-publicaciones').textContent = datos.publicaciones.length;
+        $('#total-comentarios').textContent = datos.publicaciones.reduce(
+            (total, publicacion) => total + (publicacion.comentarios || []).length,
+            0
+        );
+    }
+}
+
+async function navegar() {
+    const ruta = location.hash || '#inicio';
+    const enPerfil = ruta.startsWith('#perfil');
+    const enAdmin = ruta === '#admin';
+
+    $('#vista-inicio').hidden = enPerfil || enAdmin;
+    $('#vista-perfil').hidden = !enPerfil;
+    $('#vista-admin').hidden = !enAdmin;
+    estado.autor = 0;
+
+    if (enAdmin) {
+        if (!esAdmin()) {
+            location.hash = '#inicio';
+            throw new Error('Esta sección es exclusiva para administradores.');
+        }
+        $('#usuarios').innerHTML = '<p class="secundario">Cargando usuarios…</p>';
+    } else if (enPerfil) {
+        const coincidencia = ruta.match(/^#perfil(?:\/(\d+))?$/);
+        const identificador = coincidencia?.[1] || estado.usuario?.id_usuario;
+        if (!identificador) {
+            location.hash = '#inicio';
+            throw new Error('Iniciá sesión para ver tu perfil.');
+        }
+        estado.autor = Number(identificador);
+        $('#datos-perfil').innerHTML = '<p class="secundario">Cargando perfil…</p>';
+        $('#editar-perfil').hidden = true;
+        $('#publicaciones-perfil').innerHTML = '<p class="secundario">Cargando publicaciones…</p>';
+    } else {
+        await cargarPublicaciones();
+    }
+}
+
 async function iniciar() {
     const datos = await api('inicio');
     estado.usuario = datos.usuario;
@@ -212,15 +283,20 @@ async function iniciar() {
 
     actualizarCuenta();
     $('#crear-publicacion').hidden = true;
-    $('#vista-inicio').hidden = false;
-    $('#vista-perfil').hidden = true;
-    $('#vista-admin').hidden = true;
     $('#categorias').innerHTML = datos.categorias
         .map((categoria) => `<option value="${Number(categoria.id_categoria)}">${escapar(categoria.nombre)}</option>`)
         .join('');
 
     if (estado.usuario && $('#acceso').open) $('#acceso').close();
+    await navegar();
 }
+
+guardarFormulario('#form-buscar', async () => {
+    if (location.hash && location.hash !== '#inicio') location.hash = '#inicio';
+    else await cargarPublicaciones();
+});
+
+window.addEventListener('hashchange', () => navegar().catch((error) => mensaje(error.message, true)));
 
 if (location.protocol === 'file:') {
     mensaje('Abrí el foro desde el servidor de XAMPP.', true);
