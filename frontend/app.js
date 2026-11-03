@@ -242,6 +242,17 @@ guardarFormulario('#form-perfil', async (datos) => {
     await iniciar();
 });
 
+guardarFormulario('#form-baneo', async (datos) => {
+    await api('banear', datos);
+    $('#panel-baneo').hidden = true;
+    mensaje('Baneo aplicado.');
+    await cargarUsuarios();
+});
+
+$('#cancelar-baneo').addEventListener('click', () => {
+    $('#panel-baneo').hidden = true;
+});
+
 document.addEventListener('click', async (evento) => {
     const boton = evento.target.closest('[data-accion]');
     if (!boton || boton.disabled) return;
@@ -289,6 +300,26 @@ document.addEventListener('click', async (evento) => {
                 });
                 await cargarPublicaciones(estado.autor);
             }
+        } else if (accion === 'banear') {
+            const persona = estado.usuarios.find(
+                (usuario) => Number(usuario.id_usuario) === identificador
+            );
+            if (!persona) return;
+
+            $('#form-baneo').reset();
+            $('#form-baneo').elements.id_usuario.value = identificador;
+            $('#titulo-baneo').textContent = 'Banear a ' + persona.nombre;
+            $('#panel-baneo').hidden = false;
+            $('#form-baneo').elements.motivo.focus();
+        } else if (accion === 'desbanear') {
+            const persona = estado.usuarios.find(
+                (usuario) => Number(usuario.id_usuario) === identificador
+            );
+            if (!persona?.baneo) return;
+
+            await api('desbanear', { id_baneo: persona.baneo.id_baneo });
+            mensaje('Baneo levantado.');
+            await cargarUsuarios();
         }
     } catch (error) {
         mensaje(error.message, true);
@@ -359,6 +390,18 @@ async function cargarPublicaciones(autor = 0) {
     }
 }
 
+async function cargarUsuarios() {
+    const datos = await api('usuarios');
+    estado.usuarios = datos.usuarios;
+
+    $('#usuarios').innerHTML = datos.usuarios
+        .map(
+            (usuario) =>
+                `<article class="tarjeta usuario"><div><strong>${escapar(usuario.nombre)}</strong><p class="secundario">${escapar(usuario.correo)} · ${escapar(usuario.rol)}</p>${usuario.baneo ? `<p class="suspendido">Suspendido: ${escapar(usuario.baneo.motivo)}. ${usuario.baneo.fecha_fin ? 'Hasta ' + escapar(fecha(usuario.baneo.fecha_fin)) : 'Permanente'}.</p>` : ''}</div>${usuario.rol === 'usuario' ? `<button class="${usuario.baneo ? 'secundario-boton' : 'peligro'}" data-accion="${usuario.baneo ? 'desbanear' : 'banear'}" data-id="${Number(usuario.id_usuario)}">${usuario.baneo ? 'Levantar baneo' : 'Banear'}</button>` : ''}</article>`
+        )
+        .join('');
+}
+
 async function navegar() {
     const ruta = location.hash || '#inicio';
     const enPerfil = ruta.startsWith('#perfil');
@@ -374,7 +417,7 @@ async function navegar() {
             location.hash = '#inicio';
             throw new Error('Esta sección es exclusiva para administradores.');
         }
-        $('#usuarios').innerHTML = '<p class="secundario">Cargando usuarios…</p>';
+        await cargarUsuarios();
     } else if (enPerfil) {
         const coincidencia = ruta.match(/^#perfil(?:\/(\d+))?$/);
         const identificador = coincidencia?.[1] || estado.usuario?.id_usuario;
