@@ -245,7 +245,11 @@ document.addEventListener('click', async (evento) => {
     boton.disabled = true;
 
     try {
-        if (accion === 'editar-publicacion') {
+        if (accion === 'me-gusta') {
+            if (!estado.usuario) throw new Error('Iniciá sesión para dar me gusta.');
+            await api('me_gusta', { id_publicacion: identificador });
+            await cargarPublicaciones(estado.autor);
+        } else if (accion === 'editar-publicacion') {
             const publicacion = estado.publicaciones.find(
                 (elemento) => Number(elemento.id_publicacion) === identificador
             );
@@ -260,6 +264,17 @@ document.addEventListener('click', async (evento) => {
             $('#titulo-editor').textContent = 'Editar publicación';
             $('#cancelar-edicion').hidden = false;
             formulario.elements.titulo.focus();
+        } else if (accion === 'editar-comentario') {
+            const comentario = estado.publicaciones
+                .flatMap((publicacion) => publicacion.comentarios || [])
+                .find((elemento) => Number(elemento.id_comentario) === identificador);
+            if (!comentario) return;
+
+            const texto = prompt('Editar comentario:', comentario.contenido);
+            if (texto !== null) {
+                await api('comentar', { id_comentario: identificador, contenido: texto });
+                await cargarPublicaciones(estado.autor);
+            }
         } else if (accion.startsWith('eliminar-')) {
             if (confirm('¿Querés eliminar este contenido?')) {
                 await api('eliminar', {
@@ -276,20 +291,43 @@ document.addEventListener('click', async (evento) => {
     }
 });
 
+document.addEventListener('submit', async (evento) => {
+    const formulario = evento.target.closest('.form-comentario');
+    if (!formulario) return;
+
+    evento.preventDefault();
+    const boton = formulario.querySelector('button');
+    if (boton.disabled) return;
+    boton.disabled = true;
+
+    try {
+        await api('comentar', {
+            id_publicacion: formulario.dataset.publicacion,
+            contenido: formulario.elements.contenido.value
+        });
+        mensaje('Comentario publicado.');
+        await cargarPublicaciones(estado.autor);
+    } catch (error) {
+        mensaje(error.message, true);
+    } finally {
+        boton.disabled = false;
+    }
+});
+
 function dibujarPublicacion(publicacion) {
     const identificador = Number(publicacion.id_publicacion);
     const comentarios = (publicacion.comentarios || [])
         .map(
             (comentario) =>
-                `<div class="comentario"><strong>${escapar(comentario.nombre)}</strong><p class="contenido">${escapar(comentario.contenido)}</p></div>`
+                `<div class="comentario"><strong>${escapar(comentario.nombre)}</strong><p class="contenido">${escapar(comentario.contenido)}</p>${esPropio(comentario) ? `<button class="enlace" data-accion="editar-comentario" data-id="${Number(comentario.id_comentario)}">Editar</button>` : ''}${esPropio(comentario) || esAdmin() ? `<button class="enlace" data-accion="eliminar-comentario" data-id="${Number(comentario.id_comentario)}">Eliminar</button>` : ''}</div>`
         )
         .join('');
 
     return `<article class="tarjeta">
         <div class="cabecera-publicacion"><div class="avatar" aria-hidden="true">${escapar(iniciales(publicacion.nombre))}</div><div class="datos-autor"><a href="#perfil/${Number(publicacion.id_autor)}">${escapar(publicacion.nombre)}</a><small class="secundario">@${escapar(publicacion.nombre_usuario)} · ${escapar(fecha(publicacion.fecha_publicacion))}</small></div><span class="categoria">${escapar(publicacion.categoria)}</span></div>
         <h3>${escapar(publicacion.titulo)}</h3><p class="contenido">${escapar(publicacion.contenido)}</p>
-        <div class="acciones pie-publicacion"><button class="me-gusta ${Number(publicacion.mi_like) ? 'activo' : ''}" aria-pressed="${Boolean(Number(publicacion.mi_like))}">♡ Me gusta (${Number(publicacion.likes)})</button>${esPropio(publicacion) ? `<button class="enlace" data-accion="editar-publicacion" data-id="${identificador}">Editar</button>` : ''}${esPropio(publicacion) || esAdmin() ? `<button class="enlace" data-accion="eliminar-publicacion" data-id="${identificador}">Eliminar</button>` : ''}</div>
-        <details><summary>Comentarios (${(publicacion.comentarios || []).length})</summary>${comentarios || '<p class="secundario">Todavía no hay comentarios.</p>'}</details>
+        <div class="acciones pie-publicacion"><button class="me-gusta ${Number(publicacion.mi_like) ? 'activo' : ''}" data-accion="me-gusta" data-id="${identificador}" aria-pressed="${Boolean(Number(publicacion.mi_like))}">♡ Me gusta (${Number(publicacion.likes)})</button>${esPropio(publicacion) ? `<button class="enlace" data-accion="editar-publicacion" data-id="${identificador}">Editar</button>` : ''}${esPropio(publicacion) || esAdmin() ? `<button class="enlace" data-accion="eliminar-publicacion" data-id="${identificador}">Eliminar</button>` : ''}</div>
+        <details><summary>Comentarios (${(publicacion.comentarios || []).length})</summary>${comentarios || '<p class="secundario">Todavía no hay comentarios.</p>'}${estado.usuario ? `<form class="form-comentario" data-publicacion="${identificador}"><label>Tu comentario<textarea name="contenido" rows="2" maxlength="2000" required></textarea></label><button type="submit">Comentar</button></form>` : '<p class="secundario">Iniciá sesión para comentar.</p>'}</details>
     </article>`;
 }
 
