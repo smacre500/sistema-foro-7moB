@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Foro Institucional</title>
+        <link rel="stylesheet" href="estilos.css" />
+        <script src="app.js" defer></script>
+    </head>
+    <body>
+        <!-- Encabezado con el buscador y los botones de cuenta. -->
+        <header>
+            <div class="barra-superior">
+                <a href="#inicio" class="marca" aria-label="Foro Institucional, inicio"
+                    ><span class="marca-icono" aria-hidden="true"
+                        ><svg
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="1.7"
+                        >
+                            <path d="M4 4h16v12H9l-5 4V4Z" />
+                            <path d="M8 8h8M8 12h5" /></svg></span
+                    ><span>Foro<small>INSTITUCIONAL</small></span></a
+                >
+                <form id="form-buscar" class="busqueda" role="search">
+                    <svg
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.7"
+                        aria-hidden="true"
+                    >
+                        <circle cx="10.5" cy="10.5" r="6.5" />
+                        <path d="m16 16 5 5" />
+                    </svg>
+                    <label class="solo-lector" for="buscar">Buscar publicaciones</label>
+                    <input
+                        type="search"
+                        id="buscar"
+                        maxlength="120"
+                        placeholder="Buscar en la comunidad…"
+                    />
+                    <button type="submit">Buscar</button>
+                </form>
+                <div class="acciones-cuenta">
+                    <div id="acciones-acceso">
+                        <button type="button" id="ingresar">Ingresar</button
+                        ><button type="button" id="registrarse">Registrarme</button>
+                    </div>
+                    <button id="salir" hidden>Cerrar sesión</button>
+                </div>
+            </div>
+        </header>
+
+        <div class="contenedor">
+            <aside class="lateral" aria-label="Perfil y navegación">
+                <section class="tarjeta perfil-lateral">
+                    <div class="avatar grande" id="avatar-perfil" aria-hidden="true">FI</div>
+                    <h2 id="nombre-actual">Tu comunidad</h2>
+                    <p class="secundario" id="detalle-actual">
+                        Un espacio para compartir y aprender.
+                    </p>
+                </section>
+                <nav class="navegacion" aria-label="Navegación principal">
+                    <a href="#inicio"><span aria-hidden="true">⌂</span> Inicio</a>
+                    <a href="#perfil" id="enlace-perfil" hidden
+                        ><span aria-hidden="true">◎</span> Mi perfil</a
+                    >
+                    <button type="button" class="abrir-publicacion">
+                        <span aria-hidden="true">＋</span> Crear publicación
+                    </button>
+                    <a href="#admin" id="enlace-admin" hidden
+                        ><span aria-hidden="true">⚑</span> Administración</a
+                    >
+                </nav>
+                <div class="nota-lateral">
+                    <span class="etiqueta">NUESTRO ESPACIO</span>
+                    <p>Las mejores ideas empiezan con una conversación.</p>
+                </div>
+                <p class="pie-lateral">Foro Institucional<br />Hecho para nuestra comunidad.</p>
+            </aside>
+
+            <!-- Vistas de inicio, perfil y administración. -->
+            <main>
+                <p id="mensaje" role="status" hidden></p>
+                <section id="vista-inicio">
+                    <div class="bienvenida">
+                        <div>
+                            <span class="etiqueta">CONECTAMOS IDEAS</span>
+                            <h1>Hola, comunidad<span>.</span></h1>
+                            <p>Novedades, preguntas y conversaciones de nuestra institución.</p>
+                        </div>
+                        <span class="simbolo" aria-hidden="true">✳</span>
+                    </div>
+                    <section class="tarjeta compositor" aria-label="Crear publicación">
+                        <div class="avatar" id="avatar-compositor" aria-hidden="true">FI</div>
+                        <button type="button" class="abrir-publicacion invitacion">
+                            ¿Qué querés compartir hoy?</button
+                        ><button type="button" class="abrir-publicacion">＋ Publicar</button>
+                    </section>
+                    <section class="tarjeta" id="crear-publicacion" hidden>
+                        <h2 id="titulo-editor">Crear publicación</h2>
+                        <form id="form-publicacion">
+                            <input type="hidden" name="id_publicacion" />
+                            <label
+                                >Título<input name="titulo" minlength="3" maxlength="150" required
+                            /></label>
+                            <label
+                                >Categoría<select
+                                    name="id_categoria"
+                                    id="categorias"
+                                    required
+                                ></select
+                            ></label>
+                            <label
+                                >Contenido<textarea
+                                    name="contenido"
+                                    rows="4"
+                                    minlength="5"
+                                    maxlength="10000"
+                                    required
+                                ></textarea>
+                            </label>
+                            <div class="acciones">
+                                <button type="submit">Guardar publicación</button
+                                ><button
+                                    type="button"
+                                    class="secundario-boton"
+                                    id="cancelar-edicion"
+                                    hidden
+                                >
+                                    Cancelar edición
+                                </button>
+                            </div>
+                        </form>
+                    </section>
+                    <div class="titulo-publicaciones">
+                        <h2>Publicaciones recientes</h2>
+                        <p class="secundario" id="cantidad-publicaciones">
+                            Conversaciones de nuestra comunidad
+                        </p>
+                    </div>
+                    <div id="publicaciones" aria-live="polite">Cargando publicaciones…</div>
+                </section>
+
+                <section id="vista-perfil" hidden>
+                    <section class="tarjeta" id="datos-perfil"></section>
+                    <section class="tarjeta" id="editar-perfil" hidden>
+                        <h2>Editar mi perfil</h2>
+                        <form id="form-perfil">
+                            <label
+                                >Nombre<input name="nombre" minlength="2" maxlength="100" required
+                            /></label>
+                            <label
+                                >Sobre mí<textarea
+                                    name="biografia"
+                                    rows="3"
+                                    maxlength="500"
+                                ></textarea>
+                            </label>
+                            <button type="submit">Guardar cambios</button>
+                        </form>
+                    </section>
+                    <h2>Publicaciones del perfil</h2>
+                    <div id="publicaciones-perfil"></div>
+                </section>
+
+                <section id="vista-admin" hidden>
+                    <h1>Administración de usuarios</h1>
+                    <section class="tarjeta" id="panel-baneo" hidden>
+                        <h2 id="titulo-baneo">Banear usuario</h2>
+                        <form id="form-baneo">
+                            <input type="hidden" name="id_usuario" />
+                            <label
+                                >Motivo<textarea
+                                    name="motivo"
+                                    minlength="5"
+                                    maxlength="500"
+                                    rows="3"
+                                    required
+                                ></textarea>
+                            </label>
+                            <label
+                                >Duración<select name="dias">
+                                    <option value="1">1 día</option>
+                                    <option value="7">7 días</option>
+                                    <option value="30">30 días</option>
+                                    <option value="0">Permanente</option>
+                                </select></label
+                            >
+                            <div class="acciones">
+                                <button type="submit" class="peligro">Aplicar baneo</button
+                                ><button type="button" class="secundario-boton" id="cancelar-baneo">
+                                    Cancelar
+                                </button>
+                            </div>
+                        </form>
+                    </section>
+                    <div id="usuarios"></div>
+                </section>
+            </main>
+            <aside class="lateral-derecho" aria-label="Información de la comunidad">
+                <section class="tarjeta comunidad">
+                    <span class="etiqueta">EL FORO EN NÚMEROS</span>
+                    <h2>Una comunidad,<br />muchas voces.</h2>
+                    <div class="estadisticas">
+                        <div>
+                            <strong id="total-publicaciones">—</strong><small>publicaciones</small>
+                        </div>
+                        <div>
+                            <strong id="total-comentarios">—</strong><small>comentarios</small>
+                        </div>
+                    </div>
+                </section>
+            </aside>
+        </div>
+
+        <!-- Ventana que se usa tanto para ingresar como para registrarse. -->
+        <dialog id="acceso" aria-labelledby="titulo-acceso">
+            <div class="cabecera-dialogo">
+                <h2 id="titulo-acceso">Iniciar sesión</h2>
+                <button type="button" id="cerrar-acceso" aria-label="Cerrar">×</button>
+            </div>
+            <p class="secundario">Acceso con correo institucional @obralapiedad.com.ar.</p>
+            <form id="form-acceso">
+                <div id="campos-registro" hidden>
+                    <label
+                        >Nombre<input
+                            name="nombre"
+                            autocomplete="name"
+                            maxlength="100"
+                            minlength="2"
+                            disabled
+                    /></label>
+                    <label
+                        >Usuario<input
+                            name="nombre_usuario"
+                            autocomplete="username"
+                            maxlength="30"
+                            pattern="[a-zA-Z0-9_]{3,30}"
+                            disabled
+                    /></label>
+                    <label
+                        >Correo institucional<input
+                            name="correo"
+                            type="email"
+                            autocomplete="email"
+                            maxlength="190"
+                            placeholder="nombre@obralapiedad.com.ar"
+                            disabled
+                        /><small>Debe terminar exactamente en @obralapiedad.com.ar.</small></label
+                    >
+                </div>
+                <label id="campo-identidad"
+                    >Usuario o correo<input
+                        name="identidad"
+                        autocomplete="username"
+                        maxlength="190"
+                        required
+                /></label>
+                <label
+                    >Contraseña<input
+                        name="contrasena"
+                        type="password"
+                        autocomplete="current-password"
+                        maxlength="72"
+                        required
+                /></label>
+                <p id="error-acceso" role="alert"></p>
+                <button type="submit" id="boton-acceso">Ingresar</button>
+            </form>
+            <button type="button" class="enlace" id="cambiar-acceso">Crear una cuenta</button>
+        </dialog>
+        <noscript>Activá JavaScript para usar el foro.</noscript>
+    </body>
+</html>
