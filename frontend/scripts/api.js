@@ -1,7 +1,6 @@
 import { estado } from './estado.js';
 
-const URL_FRONTEND = 'http://localhost:8080/sistema-foro-7mob/frontend/';
-const URL_API = new URL('../backend/', URL_FRONTEND).href;
+const URL_API = new URL('../../backend/', import.meta.url).href;
 
 const rutas = {
     inicio: 'inicio.php',

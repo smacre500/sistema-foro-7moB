@@ -1,4 +1,8 @@
 <?php
+// Estas páginas varían según la ruta y la sesión; no deben reutilizarse desde caché.
+header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
+header('Pragma: no-cache');
+header('Expires: 0');
 $pagina = $pagina ?? 'inicio';
 $requestPath = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH) ?: '/';
 $base = preg_replace('#/(?:inicio|crear|admin|perfil(?:/[A-Za-z0-9_]{3,30})?)/?$#', '', $requestPath);
@@ -12,8 +16,8 @@ function e($valor) { return htmlspecialchars((string) $valor, ENT_QUOTES, 'UTF-8
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Foro Institucional</title>
-    <link rel="stylesheet" href="<?= e($base) ?>/frontend/estilos.css?v=20261103-admin4">
-    <script type="module" src="<?= e($base) ?>/frontend/scripts/main.js?v=20261104-paginas"></script>
+    <link rel="stylesheet" href="<?= e($base) ?>/frontend/estilos.css?v=20261104-nocache1">
+    <script type="module" src="<?= e($base) ?>/frontend/scripts/main.js?v=20261104-nocache1"></script>
 </head>
 <body data-pagina="<?= e($pagina) ?>" data-base="<?= e($base) ?>" data-username="<?= e($_GET['username'] ?? '') ?>">
 <header>

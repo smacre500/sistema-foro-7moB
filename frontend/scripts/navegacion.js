@@ -68,6 +68,13 @@ export async function navegar() {
 }
 
 export async function iniciar() {
+    const pagina = document.body.dataset.pagina;
+    document.querySelectorAll('.navegacion a').forEach((enlace) => {
+        const activa = enlace.getAttribute('href') === `${base()}/${pagina}`;
+        enlace.classList.toggle('activa', activa);
+        if (activa) enlace.setAttribute('aria-current', 'page');
+        else enlace.removeAttribute('aria-current');
+    });
     const datos = await api('inicio');
     estado.usuario = datos.usuario;
     estado.csrf = datos.csrf;
