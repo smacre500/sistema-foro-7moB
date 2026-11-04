@@ -4,8 +4,8 @@
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>Foro Institucional</title>
-        <link rel="stylesheet" href="estilos.css" />
-        <script src="app.js" defer></script>
+        <link rel="stylesheet" href="estilos.css?v=20261103-admin4" />
+        <script type="module" src="scripts/main.js?v=20261103-admin5"></script>
     </head>
     <body>
         <!-- Encabezado con el buscador y los botones de cuenta. -->
@@ -67,9 +67,9 @@
                     <a href="#perfil" id="enlace-perfil" hidden
                         ><span aria-hidden="true">◎</span> Mi perfil</a
                     >
-                    <button type="button" class="abrir-publicacion">
-                        <span aria-hidden="true">＋</span> Crear publicación
-                    </button>
+                    <a href="#crear" id="enlace-crear"
+                        ><span aria-hidden="true">＋</span> Crear publicación</a
+                    >
                     <a href="#admin" id="enlace-admin" hidden
                         ><span aria-hidden="true">⚑</span> Administración</a
                     >
@@ -81,7 +81,7 @@
                 <p class="pie-lateral">Foro Institucional<br />Hecho para nuestra comunidad.</p>
             </aside>
 
-            <!-- Vistas de inicio, perfil y administración. -->
+            <!-- Cada vista es una página independiente y se alterna desde JavaScript. -->
             <main>
                 <p id="mensaje" role="status" hidden></p>
                 <section id="vista-inicio">
@@ -93,14 +93,21 @@
                         </div>
                         <span class="simbolo" aria-hidden="true">✳</span>
                     </div>
-                    <section class="tarjeta compositor" aria-label="Crear publicación">
-                        <div class="avatar" id="avatar-compositor" aria-hidden="true">FI</div>
-                        <button type="button" class="abrir-publicacion invitacion">
-                            ¿Qué querés compartir hoy?</button
-                        ><button type="button" class="abrir-publicacion">＋ Publicar</button>
-                    </section>
-                    <section class="tarjeta" id="crear-publicacion" hidden>
-                        <h2 id="titulo-editor">Crear publicación</h2>
+                    <div class="titulo-publicaciones">
+                        <h2>Publicaciones recientes</h2>
+                        <p class="secundario" id="cantidad-publicaciones">
+                            Conversaciones de nuestra comunidad
+                        </p>
+                    </div>
+                    <div id="publicaciones" aria-live="polite">Cargando publicaciones…</div>
+                </section>
+
+                <section id="vista-crear" hidden>
+                    <h1 id="titulo-editor">Crear publicación</h1>
+                    <p class="secundario">
+                        Compartí una idea, una pregunta o una novedad con la comunidad.
+                    </p>
+                    <section class="tarjeta">
                         <form id="form-publicacion">
                             <input type="hidden" name="id_publicacion" />
                             <label
@@ -116,32 +123,25 @@
                             <label
                                 >Contenido<textarea
                                     name="contenido"
-                                    rows="4"
+                                    rows="6"
                                     minlength="5"
                                     maxlength="10000"
                                     required
                                 ></textarea>
                             </label>
                             <div class="acciones">
-                                <button type="submit">Guardar publicación</button
+                                <button type="submit" id="guardar-publicacion">
+                                    Guardar publicación</button
                                 ><button
                                     type="button"
                                     class="secundario-boton"
                                     id="cancelar-edicion"
-                                    hidden
                                 >
-                                    Cancelar edición
+                                    Cancelar
                                 </button>
                             </div>
                         </form>
                     </section>
-                    <div class="titulo-publicaciones">
-                        <h2>Publicaciones recientes</h2>
-                        <p class="secundario" id="cantidad-publicaciones">
-                            Conversaciones de nuestra comunidad
-                        </p>
-                    </div>
-                    <div id="publicaciones" aria-live="polite">Cargando publicaciones…</div>
                 </section>
 
                 <section id="vista-perfil" hidden>
@@ -167,7 +167,14 @@
                 </section>
 
                 <section id="vista-admin" hidden>
-                    <h1>Administración de usuarios</h1>
+                    <div class="cabecera-admin">
+                        <span class="etiqueta">GESTIÓN DE LA COMUNIDAD</span>
+                        <h1>Administración de usuarios</h1>
+                        <p class="secundario">
+                            Buscá una cuenta por usuario, nombre o correo para revisarla o aplicar una
+                            sanción.
+                        </p>
+                    </div>
                     <section class="tarjeta" id="panel-baneo" hidden>
                         <h2 id="titulo-baneo">Banear usuario</h2>
                         <form id="form-baneo">
@@ -197,23 +204,62 @@
                             </div>
                         </form>
                     </section>
-                    <div id="usuarios"></div>
+                    <section class="tarjeta tabla-admin">
+                        <div class="barra-admin">
+                            <div class="buscador-usuarios">
+                                <svg
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    stroke-width="1.7"
+                                    aria-hidden="true"
+                                >
+                                    <circle cx="10.5" cy="10.5" r="6.5" />
+                                    <path d="m16 16 5 5" />
+                                </svg>
+                                <label class="solo-lector" for="buscar-usuario"
+                                    >Buscar usuarios</label
+                                >
+                                <input
+                                    type="search"
+                                    id="buscar-usuario"
+                                    maxlength="120"
+                                    autocomplete="off"
+                                    placeholder="Buscar por usuario, nombre o correo…"
+                                />
+                            </div>
+                            <p class="secundario" id="conteo-usuarios" aria-live="polite"></p>
+                        </div>
+                        <p class="pista-tabla secundario">
+                            Deslizá la tabla para ver todas las columnas.
+                        </p>
+                        <div class="tabla-envoltura">
+                            <table class="tabla-usuarios">
+                                <caption class="solo-lector">
+                                    Cuentas registradas en el foro
+                                </caption>
+                                <thead>
+                                    <tr>
+                                        <th scope="col">Persona</th>
+                                        <th scope="col">Correo</th>
+                                        <th scope="col">Rol</th>
+                                        <th scope="col">Estado</th>
+                                        <th scope="col" class="celda-acciones">Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="usuarios">
+                                    <tr>
+                                        <td colspan="5" class="vacio">Cargando cuentas…</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <p id="sin-usuarios" class="vacio" hidden>
+                            No se encontraron cuentas con esa búsqueda.
+                        </p>
+                    </section>
                 </section>
             </main>
-            <aside class="lateral-derecho" aria-label="Información de la comunidad">
-                <section class="tarjeta comunidad">
-                    <span class="etiqueta">EL FORO EN NÚMEROS</span>
-                    <h2>Una comunidad,<br />muchas voces.</h2>
-                    <div class="estadisticas">
-                        <div>
-                            <strong id="total-publicaciones">—</strong><small>publicaciones</small>
-                        </div>
-                        <div>
-                            <strong id="total-comentarios">—</strong><small>comentarios</small>
-                        </div>
-                    </div>
-                </section>
-            </aside>
         </div>
 
         <!-- Ventana que se usa tanto para ingresar como para registrarse. -->
