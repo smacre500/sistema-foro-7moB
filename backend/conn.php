@@ -5,14 +5,6 @@ $port = 3306;
 $db = "foro_itlp";
 $user = "root";
 $password = "";
-if (file_exists(__DIR__ . "/config.local.php")) {
-    $config = require __DIR__ . "/config.local.php";
-    $host = $config["host"];
-    $port = $config["port"];
-    $db = $config["database"];
-    $user = $config["username"];
-    $password = $config["password"];
-}
 
 $dsn = "mysql:host=$host;port=$port;dbname=$db;charset=utf8mb4";
 
