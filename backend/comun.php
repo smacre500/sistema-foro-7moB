@@ -72,7 +72,7 @@ function usuarioActual($obligatorio = false) {
         }
         return null;
     }
-    if (!correoInstitucional($usuario['correo']) || baneoActivo($usuario['id_usuario'])) {
+    if (!correoInstitucional($usuario['correo'])) {
         unset($_SESSION['usuario']);
         error('Tu cuenta no tiene acceso al foro. Revisá el correo institucional o consultá al administrador.', 403);
     }
