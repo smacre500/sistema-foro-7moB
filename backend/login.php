@@ -12,9 +12,7 @@ if (!$cuenta || !is_string($clave) || !password_verify($clave, $cuenta['contrase
 if (!correoInstitucional($cuenta['correo'])) {
     error('Solo se admiten cuentas con correo @obralapiedad.com.ar.', 403);
 }
-if (baneoActivo($cuenta['id_usuario'])) {
-    error('Tu cuenta está suspendida.', 403);
-}
+// Las cuentas suspendidas pueden ingresar para consultar el foro, pero no publicar ni comentar.
 
 session_regenerate_id(true);
 $_SESSION['usuario'] = $cuenta['id_usuario'];
