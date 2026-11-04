@@ -9,6 +9,7 @@ export function actualizarCuenta() {
     $('#enlace-perfil').hidden = !usuario;
     $('#enlace-admin').hidden = !esAdmin();
     $('#enlace-crear').hidden = esBaneado();
+    $('#enlace-perfil').href = `${document.body.dataset.base || ''}/perfil/${encodeURIComponent(usuario?.nombre_usuario || '')}`;
     $('#nombre-actual').textContent = usuario?.nombre || 'Tu comunidad';
     $('#detalle-actual').textContent = usuario
         ? `@${usuario.nombre_usuario} · ${esAdmin() ? 'Administrador' : 'Miembro de la comunidad'}`
