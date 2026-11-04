@@ -16,7 +16,7 @@ function e($valor) { return htmlspecialchars((string) $valor, ENT_QUOTES, 'UTF-8
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Foro Institucional</title>
-    <link rel="stylesheet" href="<?= e($base) ?>/frontend/estilos.css?v=20261104-nocache2">
+    <link rel="stylesheet" href="<?= e($base) ?>/frontend/estilos.css?v=20261104-nocache5">
     <script type="module" src="<?= e($base) ?>/frontend/scripts/main.js?v=20261104-nocache2"></script>
 </head>
 <body data-pagina="<?= e($pagina) ?>" data-base="<?= e($base) ?>" data-username="<?= e($_GET['username'] ?? '') ?>">
