@@ -3,6 +3,9 @@ require __DIR__ . '/comun.php';
 
 $datos = datosPost();
 $usuario = usuarioActual(true);
+if (baneoActivo($usuario['id_usuario'])) {
+    error('Tu cuenta está suspendida: no podés comentar.', 403);
+}
 $contenido = campo($datos, 'contenido', 1, 2000);
 
 if (!empty($datos['id_comentario'])) {

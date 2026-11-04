@@ -3,6 +3,9 @@ require __DIR__ . '/comun.php';
 
 $datos = datosPost();
 $usuario = usuarioActual(true);
+if (baneoActivo($usuario['id_usuario'])) {
+    error('Tu cuenta está suspendida: no podés publicar ni editar publicaciones.', 403);
+}
 $titulo = campo($datos, 'titulo', 3, 150);
 $contenido = campo($datos, 'contenido', 5, 10000);
 $categoria = id($datos['id_categoria'] ?? null);
