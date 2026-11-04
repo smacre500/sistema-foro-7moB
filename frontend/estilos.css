@@ -16,7 +16,7 @@ body {
     background: var(--fondo);
     color: var(--texto);
     font:
-        15px/1.6 system-ui,
+        16px/1.6 system-ui,
         -apple-system,
         'Segoe UI',
         sans-serif;
@@ -48,7 +48,7 @@ header {
     min-width: 205px;
     color: white;
     text-decoration: none;
-    font-size: 24px;
+    font-size: 25px;
     font-weight: 720;
     line-height: 1.05;
     letter-spacing: -0.8px;
@@ -60,7 +60,7 @@ header {
 
 .marca small {
     display: block;
-    font-size: 8px;
+    font-size: 9px;
     letter-spacing: 2px;
     font-weight: 500;
     margin-top: 6px;
@@ -86,7 +86,6 @@ header {
     align-items: center;
     gap: 9px;
     flex: 1;
-    max-width: 580px;
     padding: 4px 6px 4px 13px;
     background: white;
     border-radius: 9px;
@@ -103,7 +102,7 @@ header {
     flex: 1;
     border: 0;
     padding: 8px 0;
-    font-size: 13px;
+    font-size: 14px;
     background: transparent;
 }
 
@@ -113,7 +112,7 @@ header {
     border-left: 1px solid var(--borde);
     border-radius: 0;
     padding: 5px 9px;
-    font-size: 12px;
+    font-size: 13px;
 }
 
 .acciones-cuenta {
@@ -130,7 +129,7 @@ header {
     background: #ffffff14;
     border: 1px solid #ffffff33;
     padding: 7px 12px;
-    font-size: 12px;
+    font-size: 13px;
 }
 
 .contenedor {
@@ -151,9 +150,13 @@ aside {
     background: white;
     border: 1px solid var(--borde);
     border-radius: 14px;
-    padding: 23px;
-    margin-bottom: 18px;
+    padding: 26px;
+    margin-bottom: 20px;
     box-shadow: 0 3px 15px #16324f05;
+}
+
+.publicacion {
+    padding: 30px 32px;
 }
 
 .perfil-lateral {
@@ -161,13 +164,13 @@ aside {
 }
 
 .perfil-lateral h2 {
-    font-size: 16px;
+    font-size: 17px;
     margin: 0 0 3px;
 }
 
 .perfil-lateral p {
     margin: 0;
-    font-size: 12px;
+    font-size: 13px;
     overflow-wrap: anywhere;
 }
 
@@ -175,19 +178,19 @@ aside {
     display: grid;
     place-items: center;
     flex-shrink: 0;
-    width: 40px;
-    height: 40px;
+    width: 44px;
+    height: 44px;
     border-radius: 50%;
     background: #e7eef7;
     color: var(--acento);
     font-weight: 750;
-    font-size: 13px;
+    font-size: 14px;
 }
 
 .avatar.grande {
-    width: 60px;
-    height: 60px;
-    font-size: 21px;
+    width: 64px;
+    height: 64px;
+    font-size: 23px;
     margin-bottom: 16px;
 }
 
@@ -207,7 +210,7 @@ aside {
     border-radius: 9px;
     background: none;
     color: var(--gris);
-    font-size: 13px;
+    font-size: 14px;
     font-weight: 560;
     text-align: left;
     text-decoration: none;
@@ -226,12 +229,12 @@ aside {
 
 .navegacion span {
     width: 22px;
-    font-size: 22px;
+    font-size: 23px;
     line-height: 1;
 }
 
 .etiqueta {
-    font-size: 10px;
+    font-size: 11px;
     font-weight: 750;
     letter-spacing: 1.7px;
     color: var(--gris);
@@ -251,7 +254,7 @@ aside {
 }
 
 .bienvenida h1 {
-    font-size: 32px;
+    font-size: 34px;
     letter-spacing: -1px;
     line-height: 1.2;
     margin-bottom: 11px;
@@ -263,7 +266,7 @@ aside {
 
 .bienvenida p {
     margin: 0;
-    font-size: 13px;
+    font-size: 14px;
     color: var(--gris);
     max-width: 350px;
 }
@@ -276,17 +279,17 @@ aside {
 }
 
 .titulo-publicaciones {
-    margin: 25px 0 18px;
+    margin-bottom: 18px;
 }
 
 .titulo-publicaciones h2 {
     margin: 0;
-    font-size: 16px;
+    font-size: 17px;
 }
 
 .titulo-publicaciones p {
     margin: 2px 0 0;
-    font-size: 11px;
+    font-size: 12px;
 }
 
 a {
@@ -300,19 +303,19 @@ a:hover,
 }
 
 h1 {
-    font-size: 28px;
+    font-size: 30px;
     line-height: 1.3;
     margin: 0 0 20px;
 }
 
 h2 {
-    font-size: 18px;
+    font-size: 20px;
     line-height: 1.4;
     margin: 0 0 12px;
 }
 
 h3 {
-    font-size: 19px;
+    font-size: 21px;
     line-height: 1.45;
     margin: 19px 0 8px;
     letter-spacing: -0.4px;
@@ -331,12 +334,12 @@ form {
 label {
     display: grid;
     gap: 5px;
-    font-size: 12px;
+    font-size: 13px;
     font-weight: 650;
 }
 
 label small {
-    font-size: 10px;
+    font-size: 11px;
     font-weight: 400;
     color: var(--gris);
 }
@@ -352,7 +355,7 @@ select {
     background: white;
     color: var(--texto);
     font: inherit;
-    font-size: 13px;
+    font-size: 14px;
 }
 
 textarea {
@@ -366,7 +369,7 @@ button {
     background: var(--acento);
     color: white;
     font: inherit;
-    font-size: 13px;
+    font-size: 14px;
     font-weight: 600;
     cursor: pointer;
 }
@@ -392,7 +395,7 @@ summary:focus-visible {
 
 .secundario {
     color: var(--gris);
-    font-size: 13px;
+    font-size: 14px;
 }
 
 .secundario-boton {
@@ -420,7 +423,7 @@ summary:focus-visible {
 .cabecera-publicacion {
     display: flex;
     align-items: flex-start;
-    gap: 11px;
+    gap: 13px;
 }
 
 .datos-autor {
@@ -429,32 +432,54 @@ summary:focus-visible {
     line-height: 1.5;
 }
 
-.datos-autor a {
-    font-size: 13px;
+.linea-autor {
+    display: flex;
+    align-items: baseline;
+    flex-wrap: wrap;
+    column-gap: 7px;
+    row-gap: 2px;
+}
+
+.autor-nombre {
+    font-size: 15.5px;
     font-weight: 700;
     color: var(--texto);
 }
 
-.datos-autor small {
-    display: block;
-    font-size: 10px;
-    margin-top: 2px;
+.autor-usuario {
+    font-size: 15.5px;
+    font-weight: 400;
+    color: var(--gris);
+}
+
+.autor-fecha {
+    font-size: 14px;
+    font-weight: 400;
+    color: #8a97a8;
+    white-space: nowrap;
 }
 
 .categoria {
     background: #f0f4f8;
     color: #60738a;
-    border-radius: 5px;
-    padding: 4px 8px;
-    font-size: 10px;
+    border-radius: 6px;
+    padding: 5px 9px;
+    font-size: 11px;
+    font-weight: 600;
 }
 
 .contenido {
     white-space: pre-wrap;
     overflow-wrap: anywhere;
     color: #5b697a;
-    font-size: 13px;
+    font-size: 14.5px;
     line-height: 1.85;
+}
+
+.publicacion h3 {
+    font-size: 22px;
+    line-height: 1.4;
+    margin: 22px 0 10px;
 }
 
 .pie-publicacion {
@@ -463,16 +488,21 @@ summary:focus-visible {
     margin-top: 17px;
 }
 
+.publicacion .pie-publicacion {
+    padding-top: 16px;
+    margin-top: 22px;
+}
+
 .pie-publicacion .enlace {
-    font-size: 11px;
+    font-size: 13px;
     padding: 3px 0;
 }
 
 .me-gusta {
     background: #edf2f7;
     color: var(--azul);
-    font-size: 12px;
-    padding: 7px 10px;
+    font-size: 13px;
+    padding: 8px 12px;
 }
 
 .me-gusta.activo {
@@ -481,39 +511,39 @@ summary:focus-visible {
 }
 
 details {
-    margin-top: 15px;
+    margin-top: 18px;
 }
 
 summary {
     cursor: pointer;
     color: var(--acento);
-    font-size: 12px;
+    font-size: 14px;
 }
 
 .comentario {
     background: #f5f7fa;
     border-radius: 7px;
-    padding: 12px;
-    margin-top: 10px;
+    padding: 14px;
+    margin-top: 12px;
 }
 
 .comentario strong {
-    font-size: 12px;
+    font-size: 14px;
 }
 
 .comentario .contenido {
     margin: 5px 0;
-    font-size: 12px;
+    font-size: 13.5px;
 }
 
 .comentario .enlace {
     margin-right: 10px;
-    font-size: 11px;
+    font-size: 13px;
     padding: 0;
 }
 
 .form-comentario {
-    margin-top: 12px;
+    margin-top: 14px;
 }
 
 .cabecera-admin {
@@ -585,7 +615,7 @@ summary {
 
 .barra-admin .secundario {
     margin: 0;
-    font-size: 11px;
+    font-size: 12px;
     white-space: nowrap;
 }
 
@@ -608,7 +638,7 @@ summary {
     border-bottom: 1px solid var(--borde);
     background: #f7f9fc;
     color: var(--gris);
-    font-size: 10px;
+    font-size: 11px;
     font-weight: 750;
     letter-spacing: 1.2px;
     text-align: left;
@@ -618,7 +648,7 @@ summary {
 .tabla-usuarios td {
     padding: 13px 20px;
     border-bottom: 1px solid var(--borde);
-    font-size: 13px;
+    font-size: 14px;
     vertical-align: middle;
 }
 
@@ -659,14 +689,14 @@ summary {
 
 .persona-admin strong {
     display: block;
-    font-size: 13px;
+    font-size: 14px;
     line-height: 1.4;
 }
 
 .usuario-admin {
     display: block;
     color: var(--gris);
-    font-size: 11px;
+    font-size: 12px;
     overflow-wrap: anywhere;
 }
 
@@ -678,7 +708,7 @@ summary {
     border-radius: 5px;
     background: none;
     color: var(--texto);
-    font-size: 12px;
+    font-size: 13px;
     font-weight: 500;
     text-align: left;
     white-space: nowrap;
@@ -693,7 +723,7 @@ summary {
     border-radius: 5px;
     background: #eef2f7;
     color: #60738a;
-    font-size: 10px;
+    font-size: 11px;
     font-weight: 650;
     white-space: nowrap;
 }
@@ -707,7 +737,7 @@ summary {
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    font-size: 11px;
+    font-size: 12px;
     font-weight: 650;
     white-space: nowrap;
 }
@@ -734,7 +764,7 @@ summary {
     margin-top: 3px;
     overflow: hidden;
     color: var(--gris);
-    font-size: 10px;
+    font-size: 11px;
     line-height: 1.5;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -750,7 +780,7 @@ summary {
 
 .accion-tabla {
     padding: 7px 11px;
-    font-size: 11px;
+    font-size: 12px;
     white-space: nowrap;
 }
 
@@ -769,7 +799,7 @@ summary {
     background: #e5f2e9;
     color: #295d3a;
     white-space: pre-wrap;
-    font-size: 13px;
+    font-size: 14px;
 }
 
 #mensaje.error {
@@ -817,7 +847,7 @@ dialog::backdrop {
 
 .cabecera-dialogo h2 {
     margin: 0;
-    font-size: 22px;
+    font-size: 23px;
 }
 
 #cerrar-acceso {
@@ -829,7 +859,7 @@ dialog::backdrop {
     border-radius: 50%;
     background: #f0f3f7;
     color: var(--gris);
-    font-size: 24px;
+    font-size: 25px;
 }
 
 #acceso>.enlace {
@@ -839,7 +869,7 @@ dialog::backdrop {
 
 #error-acceso {
     color: #a33d45;
-    font-size: 12px;
+    font-size: 13px;
     margin: 0;
 }
 
@@ -886,7 +916,7 @@ noscript {
 
     .marca {
         min-width: 0;
-        font-size: 21px;
+        font-size: 23px;
     }
 
     .marca-icono {
@@ -895,7 +925,7 @@ noscript {
     }
 
     .marca small {
-        font-size: 7px;
+        font-size: 8px;
     }
 
     .busqueda {
@@ -921,17 +951,21 @@ noscript {
     .navegacion a,
     .navegacion button {
         white-space: nowrap;
-        font-size: 11px;
+        font-size: 13px;
         padding: 8px 10px;
     }
 
     .navegacion span {
-        font-size: 18px;
+        font-size: 20px;
         width: auto;
     }
 
     .tarjeta {
-        padding: 18px;
+        padding: 20px;
+    }
+
+    .publicacion {
+        padding: 22px 20px;
     }
 
     .tabla-admin {
@@ -951,7 +985,7 @@ noscript {
         display: block;
         margin: 0;
         padding: 10px 16px 0;
-        font-size: 10px;
+        font-size: 11px;
     }
 
     .tabla-usuarios th,
@@ -961,11 +995,11 @@ noscript {
     }
 
     .bienvenida h1 {
-        font-size: 29px;
+        font-size: 31px;
     }
 
     .bienvenida p {
-        font-size: 12px;
+        font-size: 14px;
     }
 
     .bienvenida .simbolo {
@@ -984,18 +1018,23 @@ noscript {
 
     .acciones-cuenta button {
         padding: 6px 8px;
-        font-size: 10px;
+        font-size: 12px;
     }
 
     .marca {
-        font-size: 19px;
+        font-size: 21px;
     }
 
-    .datos-autor small {
-        font-size: 9px;
+    .autor-nombre,
+    .autor-usuario {
+        font-size: 14.5px;
+    }
+
+    .autor-fecha {
+        font-size: 13.5px;
     }
 
     .categoria {
-        font-size: 9px;
+        font-size: 10.5px;
     }
 }

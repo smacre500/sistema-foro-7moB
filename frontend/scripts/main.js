@@ -2,7 +2,7 @@ import { estado, esBaneado } from './estado.js';
 import { $, guardarFormulario, mensaje } from './util.js';
 import { api } from './api.js';
 import { abrirAcceso, guardarAcceso, prepararAcceso, validarCorreo } from './acceso.js';
-import { alternarLike, comentar, editarComentario, eliminarContenido } from './publicaciones.js';
+import { alternarLike, comentar, editarComentario, eliminarContenido } from './publicaciones.js?v=20261104-nocache2';
 import { guardarPublicacion, limpiarEditor } from './editor.js';
 import { guardarPerfil } from './perfil.js';
 import { abrirBaneo, aplicarBaneo, buscarUsuario, filtrarUsuarios, levantarBaneo } from './admin.js';
