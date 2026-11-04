@@ -1,0 +1,16 @@
+Options -Indexes
+DirectoryIndex frontend/inicio.php
+RewriteEngine On
+
+RewriteRule ^inicio/?$ frontend/inicio.php [L,QSA]
+RewriteRule ^crear/?$ frontend/crear.php [L,QSA]
+RewriteRule ^admin/?$ frontend/admin.php [L,QSA]
+RewriteRule ^perfil/?$ frontend/perfil.php [L,QSA]
+RewriteRule ^perfil/([A-Za-z0-9_]{3,30})/?$ frontend/perfil.php?username=$1 [L,QSA]
+
+RewriteCond %{THE_REQUEST} \s/+(.*/)frontend/(inicio|crear|admin)\.php(?:[?\s]) [NC]
+RewriteRule ^frontend/(inicio|crear|admin)\.php$ /%1$1 [R=302,L]
+RewriteCond %{THE_REQUEST} \s/+(.*/)frontend/perfil\.php\?username=([A-Za-z0-9_]{3,30})(?:[?\s]) [NC]
+RewriteRule ^frontend/perfil\.php$ /%1perfil/%2? [R=302,L]
+RewriteCond %{THE_REQUEST} \s/+(.*/)frontend/perfil\.php(?:[?\s]) [NC]
+RewriteRule ^frontend/perfil\.php$ /%1perfil [R=302,L]
