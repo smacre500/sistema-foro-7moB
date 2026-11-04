@@ -1,4 +1,4 @@
-<?php $pagina = 'crear'; require __DIR__ . '/includes/inicio.php'; ?>
+<?php $pagina = 'crear'; require __DIR__ . '/includes/header.php'; ?>
         <section id="vista-crear">
             <h1 id="titulo-editor">Crear publicación</h1><p class="secundario">Compartí una idea, una pregunta o una novedad con la comunidad.</p>
             <section class="tarjeta"><form id="form-publicacion"><input type="hidden" name="id_publicacion">
@@ -8,4 +8,4 @@
                 <div class="acciones"><button type="submit" id="guardar-publicacion">Guardar publicación</button><button type="button" class="secundario-boton" id="cancelar-edicion">Cancelar</button></div>
             </form></section>
         </section>
-<?php require __DIR__ . '/includes/acceso.php'; ?>
+<?php require __DIR__ . '/includes/pie.php'; ?>

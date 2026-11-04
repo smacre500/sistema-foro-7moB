@@ -13,7 +13,7 @@ if (!$usuario || $usuario['rol'] !== 'administrador') {
 header('Content-Type: text/html; charset=utf-8');
 
 $pagina = 'admin';
-require __DIR__ . '/includes/inicio.php'; ?>
+require __DIR__ . '/includes/header.php'; ?>
 <section id="vista-admin">
     <div class="cabecera-admin"><span class="etiqueta">GESTIÓN DE LA COMUNIDAD</span>
         <h1>Administración de usuarios</h1>
@@ -63,4 +63,4 @@ require __DIR__ . '/includes/inicio.php'; ?>
         <p id="sin-usuarios" class="vacio" hidden>No se encontraron cuentas con esa búsqueda.</p>
     </section>
 </section>
-<?php require __DIR__ . '/includes/acceso.php'; ?>
+<?php require __DIR__ . '/includes/pie.php'; ?>

@@ -1,4 +1,4 @@
-<?php $pagina = 'perfil'; require __DIR__ . '/includes/inicio.php'; ?>
+<?php $pagina = 'perfil'; require __DIR__ . '/includes/header.php'; ?>
         <section id="vista-perfil">
             <section class="tarjeta" id="datos-perfil"></section>
             <section class="tarjeta" id="editar-perfil" hidden><h2>Editar mi perfil</h2><form id="form-perfil">
@@ -8,4 +8,4 @@
             </form></section>
             <h2>Publicaciones del perfil</h2><div id="publicaciones-perfil"></div>
         </section>
-<?php require __DIR__ . '/includes/acceso.php'; ?>
+<?php require __DIR__ . '/includes/pie.php'; ?>
