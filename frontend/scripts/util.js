@@ -1,8 +1,5 @@
-// Ayudas de uso general: buscar elementos, dar formato y mostrar mensajes.
 
 export const $ = (selector) => document.querySelector(selector);
-
-// Las respuestas se escapan antes de armar el HTML para no interpretar etiquetas.
 export const escapar = (valor) =>
     String(valor ?? '').replace(
         /[&<>"']/g,
@@ -28,8 +25,6 @@ export function mensaje(texto, error = false) {
     $('#mensaje').classList.toggle('error', error);
     $('#mensaje').hidden = !texto;
 }
-
-// Conecta un formulario y evita envíos dobles mientras se espera la respuesta.
 export function guardarFormulario(
     selector,
     tarea,

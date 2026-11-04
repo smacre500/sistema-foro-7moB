@@ -1,4 +1,3 @@
-// Comunicación con el backend: una acción del frontend, un archivo de PHP.
 import { estado } from './estado.js';
 
 const URL_FRONTEND = 'http://localhost:8080/sistema-foro-7mob/frontend/';

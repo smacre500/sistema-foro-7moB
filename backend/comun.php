@@ -1,5 +1,4 @@
 <?php
-// funciones y configuración que usan todos los endpoints
 
 header('Content-Type: application/json; charset=utf-8');
 header('Cache-Control: no-store');

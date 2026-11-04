@@ -5,8 +5,6 @@ $port = 3306;
 $db = "foro_itlp";
 $user = "root";
 $password = "";
-
-// si existe config.local.php uso esas credenciales
 if (file_exists(__DIR__ . "/config.local.php")) {
     $config = require __DIR__ . "/config.local.php";
     $host = $config["host"];

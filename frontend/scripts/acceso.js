@@ -1,4 +1,3 @@
-// Ventana de acceso: ingresar, registrarse y reflejar la cuenta en pantalla.
 import { estado, esAdmin, esBaneado } from './estado.js';
 import { $, iniciales, mensaje } from './util.js';
 import { api } from './api.js';
@@ -16,8 +15,6 @@ export function actualizarCuenta() {
         : 'Un espacio para compartir y aprender.';
     $('#avatar-perfil').textContent = iniciales(usuario?.nombre);
 }
-
-// La misma ventana sirve para ingresar y para crear una cuenta.
 export function prepararAcceso(registro) {
     estado.registro = registro;
     $('#error-acceso').textContent = '';

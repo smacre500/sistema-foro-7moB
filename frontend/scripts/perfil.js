@@ -1,9 +1,6 @@
-// Perfil: datos públicos de una cuenta y edición de los propios.
 import { estado } from './estado.js';
 import { $, escapar, fecha } from './util.js';
 import { api } from './api.js';
-
-// Pide el perfil, completa la vista y devuelve los datos recibidos.
 export async function cargarPerfil(identificador) {
     const datos = await api('perfil', null, { id: identificador });
     const perfil = datos.perfil;

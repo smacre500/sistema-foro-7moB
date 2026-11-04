@@ -1,4 +1,3 @@
-// Navegación entre páginas (vistas) y arranque de la sesión.
 import { estado, esAdmin, esBaneado } from './estado.js';
 import { $, escapar, mensaje } from './util.js';
 import { api } from './api.js';
@@ -7,8 +6,6 @@ import { cargarPublicaciones } from './publicaciones.js';
 import { cargarPerfil } from './perfil.js';
 import { cargarUsuarios } from './admin.js';
 import { limpiarEditor } from './editor.js';
-
-// Cambia de página y la dibuja una sola vez (sin esperar al evento hashchange).
 export async function irA(ruta) {
     if (location.hash !== ruta) history.replaceState(null, '', ruta);
     await navegar();
@@ -56,8 +53,6 @@ export async function navegar() {
         await cargarPublicaciones();
     }
 }
-
-// Pide la sesión actual y dibuja la página en la que está el usuario.
 export async function iniciar() {
     const datos = await api('inicio');
     estado.usuario = datos.usuario;

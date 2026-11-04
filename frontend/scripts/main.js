@@ -1,4 +1,3 @@
-// Punto de entrada: conecta los eventos de la página y arranca el foro.
 import { estado, esBaneado } from './estado.js';
 import { $, guardarFormulario, mensaje } from './util.js';
 import { api } from './api.js';
@@ -25,8 +24,6 @@ import {
     levantarBaneo
 } from './admin.js';
 import { iniciar, irA, navegar } from './navegacion.js';
-
-// --- Ventana de acceso ---
 $('#ingresar').addEventListener('click', () => abrirAcceso(false));
 $('#registrarse').addEventListener('click', () => abrirAcceso(true));
 $('#cerrar-acceso').addEventListener('click', () => $('#acceso').close());
@@ -63,9 +60,6 @@ $('#salir').addEventListener('click', async () => {
         boton.disabled = false;
     }
 });
-
-// --- Editor de publicaciones ---
-// Crear publicación es una página propia; a los invitados se les pide la cuenta.
 const enlaceCrear = $('#enlace-crear');
 if (enlaceCrear) {
     enlaceCrear.addEventListener('click', (evento) => {
@@ -89,8 +83,6 @@ $('#cancelar-edicion').addEventListener('click', async () => {
     limpiarEditor();
     await irA('#inicio');
 });
-
-// --- Perfil y administración ---
 guardarFormulario('#form-perfil', async (datos) => {
     await guardarPerfil(datos);
     mensaje('Perfil actualizado.');
@@ -107,8 +99,6 @@ $('#cancelar-baneo').addEventListener('click', () => {
 });
 
 $('#buscar-usuario').addEventListener('input', filtrarUsuarios);
-
-// --- Acciones dentro de las listas (me gusta, editar, eliminar, baneos) ---
 document.addEventListener('click', async (evento) => {
     const boton = evento.target.closest('[data-accion]');
     if (!boton || boton.disabled) return;
@@ -168,8 +158,6 @@ document.addEventListener('submit', async (evento) => {
         boton.disabled = false;
     }
 });
-
-// --- Búsqueda y arranque ---
 guardarFormulario('#form-buscar', async () => {
     if (location.hash && location.hash !== '#inicio') location.hash = '#inicio';
     else await cargarPublicaciones();

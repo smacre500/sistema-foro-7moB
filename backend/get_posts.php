@@ -1,6 +1,4 @@
 <?php
-
-// Importante para que JS nos tome como JSON
 header("Content-Type: application/json");
 
 require_once "conn.php";
@@ -20,9 +18,6 @@ $posts = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 $zona_origen = new DateTimeZone("America/Argentina/Buenos_Aires");
 $zona_utc = new DateTimeZone("UTC");
-
-// Convertimos la fecha de cada publicación a formato UTC ISO 8601
-// OJO: CONVERTIR A GMT-3 (Argentina) EN EL FRONTEND!!!!
 foreach ($posts as &$post) {
     if (isset($post["fecha_publicacion"])) {
         $fecha = new DateTime($post["fecha_publicacion"], $zona_origen);

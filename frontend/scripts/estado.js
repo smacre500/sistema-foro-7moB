@@ -1,4 +1,3 @@
-// Estado compartido: sesión, token CSRF y datos que se muestran en pantalla.
 export const estado = {
     usuario: null,
     csrf: '',

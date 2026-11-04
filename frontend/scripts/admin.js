@@ -1,4 +1,3 @@
-// Administración: tabla de cuentas, búsqueda, baneos y levantamiento de sanciones.
 import { estado } from './estado.js';
 import { $, escapar, fecha, iniciales } from './util.js';
 import { api } from './api.js';
@@ -59,7 +58,6 @@ export async function cargarUsuarios() {
     filtrarUsuarios();
 }
 
-// Filtra la tabla por usuario, nombre o correo, sin distinguir mayúsculas ni tildes.
 export function filtrarUsuarios() {
     const consulta = normalizar($('#buscar-usuario').value.trim());
     let visibles = 0;
@@ -89,7 +87,6 @@ export function filtrarUsuarios() {
     $('#sin-usuarios').hidden = visibles > 0;
 }
 
-// Prepara el formulario de baneo para la persona elegida.
 export function abrirBaneo(persona) {
     $('#form-baneo').reset();
     $('#form-baneo').elements.id_usuario.value = Number(persona.id_usuario);

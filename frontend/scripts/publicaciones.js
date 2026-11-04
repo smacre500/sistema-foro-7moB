@@ -1,4 +1,3 @@
-// Publicaciones: dibujarlas, cargarlas y las acciones sobre ellas.
 import { estado, esAdmin, esBaneado, esPropio } from './estado.js';
 import { $, escapar, fecha, iniciales } from './util.js';
 import { api } from './api.js';
@@ -19,8 +18,6 @@ export function dibujarPublicacion(publicacion) {
         <details><summary>Comentarios (${(publicacion.comentarios || []).length})</summary>${comentarios || '<p class="secundario">Todavía no hay comentarios.</p>'}${estado.usuario ? (esBaneado() ? '<p class="secundario">Tu cuenta está suspendida: no podés comentar.</p>' : `<form class="form-comentario" data-publicacion="${identificador}"><label>Tu comentario<textarea name="contenido" rows="2" maxlength="2000" required></textarea></label><button type="submit">Comentar</button></form>`) : '<p class="secundario">Iniciá sesión para comentar.</p>'}</details>
     </article>`;
 }
-
-// Con autor = 0 carga el feed; con un id, las publicaciones de ese perfil.
 export async function cargarPublicaciones(autor = 0) {
     const datos = await api('publicaciones', null, {
         buscar: autor ? '' : $('#buscar').value.trim(),
@@ -37,8 +34,6 @@ export async function cargarPublicaciones(autor = 0) {
         $('#cantidad-publicaciones').textContent = `${datos.publicaciones.length} publicaciones en este espacio`;
     }
 }
-
-// Vuelve a pedir la lista que se está viendo (feed o perfil).
 const recargar = () => cargarPublicaciones(estado.autor);
 
 export async function alternarLike(id) {
