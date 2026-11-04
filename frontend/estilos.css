@@ -118,7 +118,7 @@ header {
 }
 .contenedor {
     display: grid;
-    grid-template-columns: 210px minmax(0, 1fr) 230px;
+    grid-template-columns: 210px minmax(0, 1fr);
     max-width: 1320px;
     padding: 30px;
     gap: 26px;
@@ -250,22 +250,6 @@ aside {
     padding-right: 6px;
     color: #e59b63;
 }
-.compositor {
-    display: flex;
-    align-items: center;
-    gap: 11px;
-    padding: 16px;
-}
-.compositor .invitacion {
-    flex: 1;
-    min-width: 0;
-    padding: 11px 12px;
-    background: #f6f8fa;
-    border: 1px solid #edf0f4;
-    color: var(--gris);
-    text-align: left;
-    font-size: 12px;
-}
 .titulo-publicaciones {
     margin: 25px 0 18px;
 }
@@ -276,31 +260,6 @@ aside {
 .titulo-publicaciones p {
     margin: 2px 0 0;
     font-size: 11px;
-}
-.comunidad {
-    padding: 22px;
-}
-.comunidad h2 {
-    font-size: 19px;
-    letter-spacing: -0.4px;
-    margin: 12px 0 20px;
-}
-.estadisticas {
-    display: flex;
-    gap: 21px;
-    border-top: 1px solid var(--borde);
-    padding-top: 15px;
-}
-.estadisticas strong {
-    display: block;
-    font-size: 22px;
-    color: var(--azul);
-    line-height: 1.4;
-}
-.estadisticas small {
-    display: block;
-    font-size: 10px;
-    color: var(--gris);
 }
 a {
     color: var(--acento);
@@ -492,16 +451,209 @@ summary {
 .form-comentario {
     margin-top: 12px;
 }
-.usuario {
+/* Administración: tabla de personas, búsqueda y correos ocultos. */
+.cabecera-admin {
+    margin-bottom: 20px;
+}
+.cabecera-admin .etiqueta {
+    display: block;
+    margin-bottom: 8px;
+}
+.cabecera-admin h1 {
+    margin-bottom: 6px;
+}
+.cabecera-admin p {
+    margin: 0;
+    max-width: 570px;
+}
+.tabla-admin {
+    padding: 0;
+    overflow: hidden;
+}
+.barra-admin {
     display: flex;
     align-items: center;
     justify-content: space-between;
     flex-wrap: wrap;
-    gap: 15px;
+    gap: 14px;
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--borde);
 }
-.suspendido {
-    color: #a33d45;
+.buscador-usuarios {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    flex: 1;
+    max-width: 390px;
+    padding: 0 12px;
+    border: 1px solid #dce3eb;
+    border-radius: 8px;
+    background: #f9fbfd;
+    color: var(--gris);
+}
+.buscador-usuarios:focus-within {
+    border-color: var(--acento);
+    background: white;
+}
+.buscador-usuarios svg {
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+}
+.buscador-usuarios input {
+    border: 0;
+    padding: 9px 0;
+    background: transparent;
+}
+.buscador-usuarios input:focus-visible {
+    outline: none;
+}
+.barra-admin .secundario {
+    margin: 0;
+    font-size: 11px;
+    white-space: nowrap;
+}
+.pista-tabla {
+    display: none;
+}
+.tabla-envoltura {
+    overflow-x: auto;
+}
+.tabla-usuarios {
+    width: 100%;
+    min-width: 700px;
+    border-collapse: collapse;
+}
+.tabla-usuarios th {
+    padding: 11px 20px;
+    border-bottom: 1px solid var(--borde);
+    background: #f7f9fc;
+    color: var(--gris);
+    font-size: 10px;
+    font-weight: 750;
+    letter-spacing: 1.2px;
+    text-align: left;
+    text-transform: uppercase;
+}
+.tabla-usuarios td {
+    padding: 13px 20px;
+    border-bottom: 1px solid var(--borde);
     font-size: 13px;
+    vertical-align: middle;
+}
+.tabla-usuarios th:nth-child(1) {
+    width: 28%;
+}
+.tabla-usuarios th:nth-child(2) {
+    width: 30%;
+}
+.tabla-usuarios th:nth-child(3) {
+    width: 13%;
+}
+.tabla-usuarios th:nth-child(4) {
+    width: 18%;
+}
+.tabla-usuarios th:nth-child(5) {
+    width: 11%;
+}
+.tabla-usuarios tbody tr:last-child td {
+    border-bottom: 0;
+}
+.tabla-usuarios tbody tr:hover {
+    background: #f8fafc;
+}
+.persona-admin {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    min-width: 165px;
+}
+.persona-admin strong {
+    display: block;
+    font-size: 13px;
+    line-height: 1.4;
+}
+.usuario-admin {
+    display: block;
+    color: var(--gris);
+    font-size: 11px;
+    overflow-wrap: anywhere;
+}
+.correo-persona {
+    display: inline-block;
+    max-width: 100%;
+    margin-left: -6px;
+    padding: 3px 6px;
+    border-radius: 5px;
+    background: none;
+    color: var(--texto);
+    font-size: 12px;
+    font-weight: 500;
+    text-align: left;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    vertical-align: middle;
+}
+.rol {
+    display: inline-block;
+    padding: 3px 8px;
+    border-radius: 5px;
+    background: #eef2f7;
+    color: #60738a;
+    font-size: 10px;
+    font-weight: 650;
+    white-space: nowrap;
+}
+.rol-administrador {
+    background: #f7ecdd;
+    color: #9a632f;
+}
+.estado {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    font-weight: 650;
+    white-space: nowrap;
+}
+.estado::before {
+    content: '';
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: currentColor;
+}
+.estado-activo {
+    color: #2f7a4d;
+}
+.estado-suspendido {
+    color: #a33d45;
+}
+.detalle-baneo {
+    display: block;
+    max-width: 230px;
+    margin-top: 3px;
+    overflow: hidden;
+    color: var(--gris);
+    font-size: 10px;
+    line-height: 1.5;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.celda-acciones {
+    text-align: right;
+}
+.tabla-usuarios th.celda-acciones {
+    text-align: right;
+}
+.accion-tabla {
+    padding: 7px 11px;
+    font-size: 11px;
+    white-space: nowrap;
+}
+.tabla-usuarios .vacio {
+    padding: 30px 20px;
 }
 #campos-registro {
     display: grid;
@@ -586,8 +738,7 @@ noscript {
 }
 /* Adaptación del diseño a escritorio, tablet y teléfono. */
 @media (min-width: 1100px) {
-    .lateral,
-    .lateral-derecho {
+    .lateral {
         position: sticky;
         top: 25px;
         align-self: start;
@@ -598,9 +749,6 @@ noscript {
         grid-template-columns: 195px minmax(0, 1fr);
         max-width: 1000px;
         gap: 22px;
-    }
-    .lateral-derecho {
-        display: none;
     }
     .barra-superior {
         max-width: 1000px;
@@ -661,18 +809,26 @@ noscript {
     .tarjeta {
         padding: 18px;
     }
-    .compositor {
-        padding: 12px;
-        gap: 8px;
+    .tabla-admin {
+        padding: 0;
     }
-    .compositor .avatar {
-        width: 32px;
-        height: 32px;
-        font-size: 11px;
+    .barra-admin {
+        padding: 14px 16px;
     }
-    .compositor button {
-        font-size: 11px;
-        padding: 10px;
+    .buscador-usuarios {
+        max-width: none;
+        flex-basis: 100%;
+    }
+    .pista-tabla {
+        display: block;
+        margin: 0;
+        padding: 10px 16px 0;
+        font-size: 10px;
+    }
+    .tabla-usuarios th,
+    .tabla-usuarios td {
+        padding-right: 14px;
+        padding-left: 14px;
     }
     .bienvenida h1 {
         font-size: 29px;
@@ -688,7 +844,6 @@ noscript {
     .contenedor {
         padding: 12px;
     }
-    .compositor .avatar,
     .bienvenida .simbolo {
         display: none;
     }
