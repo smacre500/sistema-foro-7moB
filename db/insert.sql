@@ -1,3 +1,5 @@
+-- Datos de prueba, para la base de datos es necesario cargar foro.sql --
+
 use foro_itlp;
 
 INSERT INTO categorias (nombre) VALUES ('General'), ('Academico'), ('Eventos'), ('Biblioteca'), ('Consultas');

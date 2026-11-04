@@ -1,6 +1,5 @@
 -- Base de datos limpia del foro (solo estructura).
--- No incluye usuarios, publicaciones, comentarios, likes ni baneos de prueba.
--- Las categorias base quedan cargadas para poder crear publicaciones.
+-- Las categorias base quedan cargadas porque es un requerimiento necesario para crear posts.
 
 CREATE DATABASE IF NOT EXISTS foro_itlp_limpio
     DEFAULT CHARACTER SET utf8mb4
