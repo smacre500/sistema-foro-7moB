@@ -6,6 +6,7 @@ USE foro_itlp;
 
 SET NAMES utf8mb4;
 SET time_zone = '+00:00';
+SET SQL_SAFE_UPDATES = 0;
 
 DROP TABLE IF EXISTS baneos;
 DROP TABLE IF EXISTS likes;
