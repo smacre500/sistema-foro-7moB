@@ -207,7 +207,7 @@ function datosPost() {
         error('El contenido es demasiado grande.', 413);
     }
     if (!hash_equals($_SESSION['csrf'], $_SERVER['HTTP_X_CSRF_TOKEN'] ?? '')) {
-        error('Recargá la página y volvé a intentarlo.', 419);
+        error('Recargá la página y volvé a intentarlo.', 403);
     }
     $cuerpo = file_get_contents('php://input');
     if (strlen($cuerpo) > 1048576) {
