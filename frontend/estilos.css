@@ -565,7 +565,7 @@ summary {
 .paginacion [aria-disabled="true"] { color: var(--gris); }
 .formulario-filtros { grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); align-items: end; margin-bottom: 22px; }
 .error-formulario { color: #a33d45; font-size: 13px; margin: 0; }
-#form-cambiar-clave, #form-cambiar-correo, #form-dar-baja { border-top: 1px solid var(--borde); padding-top: 16px; }
+#form-cambiar-clave, #form-dar-baja { border-top: 1px solid var(--borde); padding-top: 16px; }
 #form-dar-baja input[type="checkbox"] { width: auto; }
 
 .cabecera-admin {

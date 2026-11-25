@@ -78,9 +78,7 @@ En `backend/conn.php` se configuran:
 - `$port`: puerto del servidor de base de datos, habitualmente `3306`.
 - `$db`: nombre de la base, `foro_itlp`.
 - `$user` y `$password`: credenciales de MySQL.
-- `$urlForo`: dirección pública usada para construir el enlace de confirmación cuando una persona solicita cambiar su correo.
-
-La conexión admite las variables de entorno `FORO_DB_HOST`, `FORO_DB_PORT`, `FORO_DB_NAME`, `FORO_DB_USER`, `FORO_DB_PASSWORD` y `FORO_URL`. Si no se definen, usa `127.0.0.1`, `3306`, `foro_itlp`, `root`, contraseña vacía y `http://localhost/sistema-foro-7moB`. Para publicar el foro, configurá credenciales propias fuera del repositorio.
+La conexión admite las variables de entorno `FORO_DB_HOST`, `FORO_DB_PORT`, `FORO_DB_NAME`, `FORO_DB_USER` y `FORO_DB_PASSWORD`. Si no se definen, usa `127.0.0.1`, `3306`, `foro_itlp`, `root` y contraseña vacía. Para publicar el foro, configurá credenciales propias fuera del repositorio.
 
 No uses el usuario `root` sin contraseña en un servidor publicado. Creá un usuario de base de datos con los permisos mínimos necesarios y configurá sus credenciales fuera de un repositorio público.
 
@@ -101,7 +99,7 @@ El esquema tiene estas tablas:
 
 `db/insert.sql` contiene datos de ejemplo (cuentas, publicaciones, reacciones y sanciones) para una demostración. Usalo una sola vez y solo en una base de prueba. El archivo también inserta categorías, aunque `foro.sql` ya agrega categorías; revisá ese bloque para evitar duplicarlas si cargás ambos scripts.
 
-Las correcciones documentadas en esta copia no agregan tablas ni columnas. Las contraseñas temporales, la baja de cuenta, los correos confirmados, las sesiones auxiliares y los tokens se manejan con archivos JSON en `backend/storage/`.
+Las correcciones documentadas en esta copia no agregan tablas ni columnas. Las contraseñas temporales, la baja de cuenta y las versiones de sesión auxiliares se manejan con archivos JSON en `backend/storage/`.
 
 ## Funciones por rol
 
@@ -118,7 +116,6 @@ Las correcciones documentadas en esta copia no agregan tablas ni columnas. Las c
 - Dar o quitar “Me gusta”.
 - Editar su perfil.
 - Cambiar su contraseña indicando la contraseña actual.
-- Solicitar un cambio de correo institucional; la nueva dirección se confirma por correo.
 - Solicitar la baja de su cuenta confirmando su contraseña. La baja conserva publicaciones y comentarios.
 
 ### Administrador
@@ -155,7 +152,6 @@ Todos los cambios de estado se envían como `POST` con JSON y token CSRF. La fun
 | `eliminar.php` | Eliminar publicaciones o comentarios según el rol y la autoría. |
 | `perfil_guardar.php` | Guardar datos del perfil propio. |
 | `cambiar_clave.php` | Cambiar contraseña con la contraseña actual. |
-| `cambiar_correo.php`, `confirmar_cuenta.php` | Solicitar y confirmar el cambio de correo. Esta operación sí necesita que PHP pueda enviar correo. |
 | `dar_baja.php` | Desactivar la cuenta después de verificar la contraseña. |
 | `usuarios.php`, `banear.php`, `desbanear.php` | Consultar y gestionar cuentas desde Administración. |
 | `restablecer_clave.php` | Restablecer una contraseña a una clave temporal; solo administrador. |
@@ -167,7 +163,7 @@ Todos los cambios de estado se envían como `POST` con JSON y token CSRF. La fun
 
 Los archivos de `backend/storage/` complementan la base sin alterar su esquema:
 
-- `estado-cuentas.json`: hashes auxiliares de contraseñas, correos confirmados, bajas, versiones de sesión, marcas de cambio obligatorio y tokens pendientes.
+- `estado-cuentas.json`: hashes auxiliares de contraseñas, datos de cuentas dadas de baja, versiones de sesión y marcas de cambio obligatorio.
 - `eliminaciones.jsonl`: una línea JSON por eliminación, con el tipo, los IDs de autor y administrador, el motivo y la fecha.
 - `.htaccess`: impide que Apache sirva directamente los archivos de almacenamiento.
 - `.gitkeep`: conserva la carpeta en copias donde todavía no se generaron archivos de estado.
@@ -196,7 +192,7 @@ Las cuentas suspendidas o dadas de baja no se pueden restablecer desde ese botó
 - Edición de comentarios en un diálogo de la interfaz en lugar de `prompt()`.
 - Validación coherente del tamaño del contenido de publicaciones con el límite de la columna SQL existente.
 - Baja lógica de cuentas y cierre/invalidez de sesiones auxiliares sin borrar publicaciones.
-- Cambio de correo confirmado por enlace, separado de la recuperación de contraseña.
+- Se quitó la opción de cambiar el correo desde el foro; para iniciar sesión se conserva la dirección registrada.
 - Recuperación por correo eliminada y reemplazada por restablecimiento administrativo con clave temporal y cambio obligatorio.
 - Importación única de módulos JavaScript que antes podían cargarse con URLs distintas.
 - Retiro del endpoint antiguo de publicaciones que ya no se usaba.
@@ -211,7 +207,6 @@ Los cambios descritos están en esta copia local. El esquema y los scripts `db/f
 | `/inicio` funciona, pero `/admin` o `/perfil` da 404 | Activá `mod_rewrite`, habilitá `AllowOverride All` y reiniciá Apache. Comprobá que `.htaccess` esté en la raíz del proyecto. |
 | Error de CSRF o aviso para recargar | Habilitá sesiones persistentes de PHP y verificá permisos de escritura en la carpeta configurada como `session.save_path`. El navegador y la API deben usar el mismo host y puerto. |
 | No se puede guardar un cambio de cuenta o auditoría | Revisá permisos de escritura en `backend/storage/` y que Apache pueda acceder a esa ruta. |
-| No llega la confirmación de cambio de correo | Esa operación depende de `mail()`; configurá SMTP para PHP y revisá `$urlForo`. La recuperación de contraseña no usa correo. |
 | La clave temporal no deja entrar | Verificá que se esté usando el nombre de usuario exacto y la clave mostrada al administrador; cada restablecimiento reemplaza la anterior. Si ya se cerró el aviso, el administrador debe generar otra. |
 
 ## Capturas de pantalla

@@ -5,8 +5,6 @@ $port = (int) (getenv('FORO_DB_PORT') ?: 3306);
 $db = getenv('FORO_DB_NAME') ?: 'foro_itlp';
 $user = getenv('FORO_DB_USER') ?: 'root';
 $password = getenv('FORO_DB_PASSWORD') ?: '';
-$urlForo = rtrim(getenv('FORO_URL') ?: 'http://localhost/sistema-foro-7moB', '/');
-
 $dsn = "mysql:host=$host;port=$port;dbname=$db;charset=utf8mb4";
 
 try {

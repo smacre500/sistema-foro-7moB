@@ -10,8 +10,6 @@ const rutas = {
     publicaciones: 'publicaciones.php',
     publicacion: 'publicacion.php',
     reportes: 'reportes.php',
-    confirmar_cuenta: 'confirmar_cuenta.php',
-    cambiar_correo: 'cambiar_correo.php',
     cambiar_clave: 'cambiar_clave.php',
     dar_baja: 'dar_baja.php',
     publicar: 'publicar.php',

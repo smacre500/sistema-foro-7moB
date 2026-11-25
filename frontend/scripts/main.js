@@ -66,10 +66,6 @@ if ($('#form-cambiar-clave')) guardarFormulario('#form-cambiar-clave', async (da
     await api('cambiar_clave', datos);
     location.href = `${document.body.dataset.base || ''}/inicio?mensaje=sesion`;
 });
-if ($('#form-cambiar-correo')) guardarFormulario('#form-cambiar-correo', async (datos) => {
-    const resultado = await api('cambiar_correo', datos);
-    mensaje(resultado.mensaje);
-});
 if ($('#form-dar-baja')) guardarFormulario('#form-dar-baja', async (datos) => {
     await api('dar_baja', datos);
     location.href = `${document.body.dataset.base || ''}/inicio?mensaje=baja`;
@@ -145,16 +141,5 @@ if (aviso === 'publicacion') mensaje('Publicación guardada.');
 if (aviso === 'sesion') mensaje('Las credenciales cambiaron. Iniciá sesión nuevamente.');
 if (aviso === 'baja') mensaje('La cuenta quedó desactivada.');
 if (new URLSearchParams(location.search).has('acceso')) abrirAcceso(false);
-const parametrosInicio = new URLSearchParams(location.search);
-const tokenCorreoPendiente = parametrosInicio.get('accion') === 'confirmar-correo'
-    ? parametrosInicio.get('token')
-    : null;
 if (location.protocol === 'file:') mensaje('Abrí el foro desde el servidor de XAMPP.', true);
-else iniciar().then(async () => {
-    if (tokenCorreoPendiente) {
-        try {
-            await api('confirmar_cuenta', { token: tokenCorreoPendiente });
-            mensaje('Correo actualizado. Iniciá sesión nuevamente.');
-        } catch (error) { mensaje(error.message, true); }
-    }
-}).catch((error) => mensaje(error.message, true));
+else iniciar().catch((error) => mensaje(error.message, true));

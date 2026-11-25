@@ -16,7 +16,6 @@ export async function cargarPerfil(identificador) {
     $('#editar-perfil').hidden = !propio || debeCambiarClave;
     $('#seguridad-cuenta').hidden = !propio;
     $('#aviso-clave-temporal').hidden = !propio || !debeCambiarClave;
-    $('#form-cambiar-correo').hidden = debeCambiarClave;
     if (propio) {
         $('#form-perfil').elements.nombre.value = perfil.nombre;
         $('#form-perfil').elements.biografia.value = perfil.biografia;
