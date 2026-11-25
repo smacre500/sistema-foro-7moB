@@ -11,7 +11,8 @@ const normalizar = (valor) =>
 export const buscarUsuario = (id) =>
     estado.usuarios.find((usuario) => Number(usuario.id_usuario) === Number(id));
 
-const celdaEstado = (baneo) => {
+const celdaEstado = ({ activa, baneo }) => {
+    if (!activa) return '<span class="estado estado-suspendido">Desactivada</span>';
     if (!baneo) return '<span class="estado estado-activo">Activo</span>';
 
     const alcance = baneo.fecha_fin ? `Hasta el ${escapar(fecha(baneo.fecha_fin))}` : 'Permanente';
@@ -40,9 +41,9 @@ const filaUsuario = (usuario) => {
             <td>
                 <span class="rol ${esUsuario ? '' : 'rol-administrador'}">${esUsuario ? 'Usuario' : 'Administrador'}</span>
             </td>
-            <td>${celdaEstado(usuario.baneo)}</td>
+            <td>${celdaEstado(usuario)}</td>
             <td class="celda-acciones">
-                ${esUsuario ? `<div class="acciones-tabla">
+                ${esUsuario && usuario.activa ? `<div class="acciones-tabla">
                     <button type="button" class="accion-tabla ${baneado ? 'secundario-boton' : 'peligro'}" data-accion="${baneado ? 'desbanear' : 'banear'}" data-id="${identificador}">${baneado ? 'Levantar baneo' : 'Banear'}</button>
                     ${baneado ? '' : `<button type="button" class="accion-tabla secundario-boton" data-accion="restablecer-clave" data-id="${identificador}">Restablecer contraseña</button>`}
                 </div>` : '<span class="secundario">Sin acciones</span>'}
