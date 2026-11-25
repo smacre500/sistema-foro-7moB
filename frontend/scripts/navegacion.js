@@ -49,7 +49,10 @@ export async function navegar() {
             return;
         }
         const perfil = await cargarPerfil(identidad);
-        await cargarPublicaciones(Number(perfil.id_usuario));
+        if (!estado.usuario?.debe_cambiar_clave) {
+            $('#actividad-perfil').hidden = false;
+            await cargarPublicaciones(Number(perfil.id_usuario));
+        }
         return;
     }
     if (pagina === 'admin') {
@@ -75,7 +78,9 @@ export async function iniciar() {
     estado.usuario = datos.usuario;
     estado.csrf = datos.csrf;
     actualizarCuenta();
-    if (estado.usuario?.debe_cambiar_clave && pagina !== 'perfil') {
+    const username = document.body.dataset.username;
+    if (estado.usuario?.debe_cambiar_clave &&
+        (pagina !== 'perfil' || (username && username !== estado.usuario.nombre_usuario))) {
         location.replace(`${base()}/perfil?cambiar-clave=1`);
         return;
     }

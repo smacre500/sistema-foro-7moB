@@ -15,6 +15,7 @@ export async function cargarPerfil(identificador) {
     const debeCambiarClave = Boolean(estado.usuario?.debe_cambiar_clave);
     $('#editar-perfil').hidden = !propio || debeCambiarClave;
     $('#seguridad-cuenta').hidden = !propio;
+    $('#form-dar-baja').hidden = debeCambiarClave;
     $('#aviso-clave-temporal').hidden = !propio || !debeCambiarClave;
     if (propio) {
         $('#form-perfil').elements.nombre.value = perfil.nombre;
