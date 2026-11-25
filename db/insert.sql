@@ -2,8 +2,6 @@
 
 use foro_itlp;
 
-INSERT INTO categorias (nombre) VALUES ('General'), ('Academico'), ('Eventos'), ('Biblioteca'), ('Consultas');
-
 SET time_zone = '+00:00';
 
 INSERT INTO usuarios

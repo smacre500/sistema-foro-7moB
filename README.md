@@ -97,7 +97,7 @@ El esquema tiene estas tablas:
 
 `db/foro.sql` crea la base `foro_itlp`, crea las tablas y agrega las categorías iniciales. **El script ejecuta `DROP TABLE` sobre esas tablas**: usalo únicamente para una instalación nueva o después de respaldar y revisar la base. No lo importes sobre una base con información que quieras conservar.
 
-`db/insert.sql` contiene datos de ejemplo (cuentas, publicaciones, reacciones y sanciones) para una demostración. Usalo una sola vez y solo en una base de prueba. El archivo también inserta categorías, aunque `foro.sql` ya agrega categorías; revisá ese bloque para evitar duplicarlas si cargás ambos scripts.
+`db/insert.sql` contiene datos de ejemplo (cuentas, publicaciones, reacciones y sanciones) para una demostración. Usalo una sola vez y solo en una base de prueba, después de importar `foro.sql`, que ya agrega las categorías.
 
 Las correcciones documentadas en esta copia no agregan tablas ni columnas. Las contraseñas temporales, la baja de cuenta y las versiones de sesión auxiliares se manejan con archivos JSON en `backend/storage/`.
 
@@ -197,7 +197,7 @@ Las cuentas suspendidas o dadas de baja no se pueden restablecer desde ese botó
 - Importación única de módulos JavaScript que antes podían cargarse con URLs distintas.
 - Retiro del endpoint antiguo de publicaciones que ya no se usaba.
 
-Los cambios descritos están en esta copia local. El esquema y los scripts `db/foro.sql` y `db/insert.sql` no se modificaron para agregar estas funciones.
+Los cambios descritos conservan el esquema de `db/foro.sql`.
 
 ## Solución de problemas
 
