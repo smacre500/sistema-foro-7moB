@@ -118,14 +118,17 @@ function registrarEliminacionLocal($registro) {
     fclose($archivo);
 }
 
-function eliminacionesLocales($desde, $hasta) {
+function eliminacionesLocales($desde, $hasta, $categoria) {
     $ruta = __DIR__ . '/storage/eliminaciones.jsonl';
     if (!is_file($ruta)) return [];
     $lineas = file($ruta, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
     $registros = [];
     foreach ($lineas as $linea) {
         $dato = json_decode($linea, true);
-        if (is_array($dato) && ($dato['fecha'] ?? '') >= $desde && ($dato['fecha'] ?? '') < $hasta) $registros[] = $dato;
+        if (is_array($dato) && ($dato['fecha'] ?? '') >= $desde && ($dato['fecha'] ?? '') < $hasta
+            && ($categoria === 0 || (int) ($dato['id_categoria'] ?? 0) === $categoria)) {
+            $registros[] = $dato;
+        }
     }
     return array_slice(array_reverse($registros), 0, 50);
 }

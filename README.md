@@ -164,7 +164,7 @@ Todos los cambios de estado se envían como `POST` con JSON y token CSRF. La fun
 Los archivos de `backend/storage/` complementan la base sin alterar su esquema:
 
 - `estado-cuentas.json`: hashes auxiliares de contraseñas, datos de cuentas dadas de baja, versiones de sesión y marcas de cambio obligatorio.
-- `eliminaciones.jsonl`: una línea JSON por eliminación, con el tipo, los IDs de autor y administrador, el motivo y la fecha.
+- `eliminaciones.jsonl`: una línea JSON por eliminación, con el tipo, los IDs de categoría, autor y administrador, el motivo y la fecha. Los registros antiguos sin categoría aparecen al seleccionar **Todas**.
 - `.htaccess`: impide que Apache sirva directamente los archivos de almacenamiento.
 - `.gitkeep`: conserva la carpeta en copias donde todavía no se generaron archivos de estado.
 

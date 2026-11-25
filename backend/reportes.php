@@ -58,7 +58,7 @@ $masGustadas = consulta(
     [$desdeUtc, $hastaUtc, $categoria, $categoria]
 )->fetchAll();
 
-$eliminaciones = eliminacionesLocales($desdeUtc, $hastaUtc);
+$eliminaciones = eliminacionesLocales($desdeUtc, $hastaUtc, $categoria);
 responder([
     'ok' => true,
     'por_categoria' => $porCategoria,
