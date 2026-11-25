@@ -6,7 +6,8 @@ $usuario = usuarioActual(false);
 
 // Con restringir el rol administrador desde el servidor ya es suficiente para que nadie pueda acceder
 if (!$usuario || $usuario['rol'] !== 'administrador') {
-    header('Location: inicio');
+    $ruta = parse_url($_SERVER['REQUEST_URI'] ?? '', PHP_URL_PATH) ?? '';
+    header('Location: ' . (str_ends_with($ruta, '/') ? '../inicio' : 'inicio'));
     exit;
 }
 
