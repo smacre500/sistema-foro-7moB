@@ -2,10 +2,10 @@ import { estado, esBaneado } from './estado.js';
 import { $, guardarFormulario, mensaje } from './util.js';
 import { api } from './api.js';
 import { abrirAcceso, guardarAcceso, prepararAcceso, validarCorreo } from './acceso.js';
-import { alternarLike, comentar, editarComentario, eliminarContenido } from './publicaciones.js?v=20261104-nocache2';
+import { alternarLike, comentar, editarComentario, eliminarContenido, guardarComentarioEditado, confirmarEliminacion } from './publicaciones.js';
 import { guardarPublicacion, limpiarEditor } from './editor.js';
 import { guardarPerfil } from './perfil.js';
-import { abrirBaneo, aplicarBaneo, buscarUsuario, filtrarUsuarios, levantarBaneo } from './admin.js';
+import { abrirBaneo, aplicarBaneo, buscarUsuario, filtrarUsuarios, levantarBaneo, cargarReportes } from './admin.js';
 import { iniciar, irA } from './navegacion.js';
 
 const on = (selector, evento, handler) => $(selector)?.addEventListener(evento, handler);
@@ -62,6 +62,28 @@ if ($('#form-perfil')) guardarFormulario('#form-perfil', async (datos) => {
     mensaje('Perfil actualizado.');
     await iniciar();
 });
+if ($('#form-cambiar-clave')) guardarFormulario('#form-cambiar-clave', async (datos) => {
+    await api('cambiar_clave', datos);
+    location.href = `${document.body.dataset.base || ''}/inicio?mensaje=sesion`;
+});
+if ($('#form-cambiar-correo')) guardarFormulario('#form-cambiar-correo', async (datos) => {
+    const resultado = await api('cambiar_correo', datos);
+    mensaje(resultado.mensaje);
+});
+if ($('#form-dar-baja')) guardarFormulario('#form-dar-baja', async (datos) => {
+    await api('dar_baja', datos);
+    location.href = `${document.body.dataset.base || ''}/inicio?mensaje=baja`;
+});
+if ($('#form-reportes')) guardarFormulario('#form-reportes', async (datos) => {
+    await cargarReportes(datos);
+}, (error) => { $('#error-reportes').textContent = error.message; });
+document.querySelectorAll('.cancelar-dialogo, .cerrar-dialogo').forEach((boton) => boton.addEventListener('click', () => boton.closest('dialog').close()));
+if ($('#form-editar-comentario')) guardarFormulario('#form-editar-comentario', async (_datos, formulario) => {
+    await guardarComentarioEditado(formulario);
+}, (error) => { $('#form-editar-comentario .error-formulario').textContent = error.message; });
+if ($('#form-eliminar')) guardarFormulario('#form-eliminar', async (_datos, formulario) => {
+    await confirmarEliminacion(formulario);
+}, (error) => { $('#form-eliminar .error-formulario').textContent = error.message; });
 if ($('#form-baneo')) guardarFormulario('#form-baneo', async (datos) => {
     await aplicarBaneo(datos);
     mensaje('Baneo aplicado.');
@@ -83,6 +105,11 @@ document.addEventListener('click', async (evento) => {
         else if (accion === 'banear') {
             const persona = buscarUsuario(identificador);
             if (persona) abrirBaneo(persona);
+        } else if (accion === 'restablecer-clave') {
+            const persona = buscarUsuario(identificador);
+            if (!persona || !window.confirm(`¿Restablecer la contraseña de @${persona.nombre_usuario}? La nueva contraseña temporal se mostrará una sola vez.`)) return;
+            const resultado = await api('restablecer_clave', { id_usuario: identificador });
+            window.alert(`Contraseña temporal para @${persona.nombre_usuario}:\n\n${resultado.contrasena_temporal}\n\nEntrégasela en persona. La persona deberá cambiarla al iniciar sesión.`);
         } else if (accion === 'desbanear') {
             const persona = buscarUsuario(identificador);
             if (!persona) return;
@@ -115,6 +142,19 @@ document.addEventListener('submit', async (evento) => {
 
 const aviso = new URLSearchParams(location.search).get('mensaje');
 if (aviso === 'publicacion') mensaje('Publicación guardada.');
+if (aviso === 'sesion') mensaje('Las credenciales cambiaron. Iniciá sesión nuevamente.');
+if (aviso === 'baja') mensaje('La cuenta quedó desactivada.');
 if (new URLSearchParams(location.search).has('acceso')) abrirAcceso(false);
+const parametrosInicio = new URLSearchParams(location.search);
+const tokenCorreoPendiente = parametrosInicio.get('accion') === 'confirmar-correo'
+    ? parametrosInicio.get('token')
+    : null;
 if (location.protocol === 'file:') mensaje('Abrí el foro desde el servidor de XAMPP.', true);
-else iniciar().catch((error) => mensaje(error.message, true));
+else iniciar().then(async () => {
+    if (tokenCorreoPendiente) {
+        try {
+            await api('confirmar_cuenta', { token: tokenCorreoPendiente });
+            mensaje('Correo actualizado. Iniciá sesión nuevamente.');
+        } catch (error) { mensaje(error.message, true); }
+    }
+}).catch((error) => mensaje(error.message, true));

@@ -14,6 +14,24 @@
         <p id="error-acceso" role="alert"></p><button type="submit" id="boton-acceso">Ingresar</button>
     </form>
     <button type="button" class="enlace" id="cambiar-acceso">Crear una cuenta</button>
+    <p class="secundario">¿Olvidaste tu contraseña? Pedile al administrador del foro que la restablezca.</p>
+</dialog>
+<dialog id="dialogo-editar-comentario" aria-labelledby="titulo-editar-comentario">
+    <div class="cabecera-dialogo"><h2 id="titulo-editar-comentario">Editar comentario</h2><button type="button" class="cerrar-dialogo" aria-label="Cerrar">×</button></div>
+    <form id="form-editar-comentario"><input type="hidden" name="id_comentario">
+        <label>Comentario<textarea name="contenido" rows="4" maxlength="2000" required></textarea></label>
+        <p class="error-formulario" role="alert"></p>
+        <div class="acciones"><button type="submit">Guardar</button><button type="button" class="secundario-boton cancelar-dialogo">Cancelar</button></div>
+    </form>
+</dialog>
+<dialog id="dialogo-eliminar" aria-labelledby="titulo-eliminar">
+    <div class="cabecera-dialogo"><h2 id="titulo-eliminar">Eliminar contenido</h2><button type="button" class="cerrar-dialogo" aria-label="Cerrar">×</button></div>
+    <form id="form-eliminar"><input type="hidden" name="tipo"><input type="hidden" name="id">
+        <p>¿Querés eliminar este contenido?</p>
+        <label id="campo-motivo-eliminacion" hidden>Motivo de la eliminación<textarea name="motivo" minlength="5" maxlength="500"></textarea></label>
+        <p class="error-formulario" role="alert"></p>
+        <div class="acciones"><button type="submit" class="peligro">Eliminar</button><button type="button" class="secundario-boton cancelar-dialogo">Cancelar</button></div>
+    </form>
 </dialog>
 <noscript>Activá JavaScript para usar el foro.</noscript>
 </body>

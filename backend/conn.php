@@ -1,10 +1,11 @@
 <?php
 
-$host = "127.0.0.1";
-$port = 3306;
-$db = "foro_itlp";
-$user = "root";
-$password = "";
+$host = getenv('FORO_DB_HOST') ?: '127.0.0.1';
+$port = (int) (getenv('FORO_DB_PORT') ?: 3306);
+$db = getenv('FORO_DB_NAME') ?: 'foro_itlp';
+$user = getenv('FORO_DB_USER') ?: 'root';
+$password = getenv('FORO_DB_PASSWORD') ?: '';
+$urlForo = rtrim(getenv('FORO_URL') ?: 'http://localhost/sistema-foro-7moB', '/');
 
 $dsn = "mysql:host=$host;port=$port;dbname=$db;charset=utf8mb4";
 

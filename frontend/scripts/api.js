@@ -8,6 +8,12 @@ const rutas = {
     registro: 'registro.php',
     salir: 'salir.php',
     publicaciones: 'publicaciones.php',
+    publicacion: 'publicacion.php',
+    reportes: 'reportes.php',
+    confirmar_cuenta: 'confirmar_cuenta.php',
+    cambiar_correo: 'cambiar_correo.php',
+    cambiar_clave: 'cambiar_clave.php',
+    dar_baja: 'dar_baja.php',
     publicar: 'publicar.php',
     comentar: 'comentar.php',
     me_gusta: 'me_gusta.php',
@@ -15,6 +21,7 @@ const rutas = {
     perfil: 'perfil.php',
     perfil_guardar: 'perfil_guardar.php',
     usuarios: 'usuarios.php',
+    restablecer_clave: 'restablecer_clave.php',
     banear: 'banear.php',
     desbanear: 'desbanear.php'
 };

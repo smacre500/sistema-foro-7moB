@@ -19,6 +19,20 @@ require __DIR__ . '/includes/header.php'; ?>
         <h1>Administración de usuarios</h1>
         <p class="secundario">Buscá una cuenta por usuario, nombre o correo para revisarla o aplicar una sanción.</p>
     </div>
+    <section class="tarjeta" id="seccion-reportes">
+        <h2>Reportes de publicaciones</h2>
+        <p class="secundario">Las fechas se interpretan según el horario de Argentina. Los me gusta se agrupan por fecha de publicación.</p>
+        <form id="form-reportes" class="formulario-filtros">
+            <label>Desde<input type="date" name="desde" required></label>
+            <label>Hasta<input type="date" name="hasta" required></label>
+            <label>Categoría<select name="categoria" id="categoria-reporte"><option value="0">Todas</option></select></label>
+            <button type="submit">Ver reporte</button>
+        </form>
+        <p id="error-reportes" role="alert"></p>
+        <h3>Publicaciones por categoría</h3><div id="reporte-categorias"></div>
+        <h3>Diez publicaciones con más me gusta</h3><div id="reporte-me-gusta"></div>
+        <h3>Eliminaciones recientes</h3><div id="reporte-eliminaciones"></div>
+    </section>
     <section class="tarjeta" id="panel-baneo" hidden>
         <h2 id="titulo-baneo">Banear usuario</h2>
         <form id="form-baneo"><input type="hidden" name="id_usuario">

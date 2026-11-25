@@ -1,0 +1,5 @@
+# Estado dinámico de cuentas y auditoría; no subir datos de usuarios.
+/backend/storage/*.json
+/backend/storage/*.jsonl
+!/backend/storage/.gitkeep
+!/backend/storage/.htaccess

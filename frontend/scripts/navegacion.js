@@ -4,7 +4,7 @@ import { api } from './api.js';
 import { actualizarCuenta } from './acceso.js';
 import { cargarPublicaciones } from './publicaciones.js';
 import { cargarPerfil } from './perfil.js';
-import { cargarUsuarios } from './admin.js';
+import { cargarUsuarios, cargarReportes } from './admin.js';
 import { limpiarEditor, abrirEditor } from './editor.js';
 
 const base = () => document.body.dataset.base || '';
@@ -33,13 +33,8 @@ export async function navegar() {
         limpiarEditor();
         const id = new URLSearchParams(location.search).get('editar');
         if (id) {
-            const datos = await api('publicaciones');
-            const publicacion = datos.publicaciones.find((item) => Number(item.id_publicacion) === Number(id));
-            if (!publicacion || Number(publicacion.id_autor) !== Number(estado.usuario.id_usuario)) {
-                mensaje('No se encontró una publicación tuya para editar.', true);
-                return;
-            }
-            abrirEditor(publicacion);
+            const datos = await api('publicacion', null, { id });
+            abrirEditor(datos.publicacion);
         } else {
             $('#form-publicacion').elements.titulo.focus();
         }
@@ -64,6 +59,7 @@ export async function navegar() {
             return;
         }
         await cargarUsuarios();
+        await cargarReportes();
     }
 }
 
@@ -79,12 +75,17 @@ export async function iniciar() {
     estado.usuario = datos.usuario;
     estado.csrf = datos.csrf;
     actualizarCuenta();
+    if (estado.usuario?.debe_cambiar_clave && pagina !== 'perfil') {
+        location.replace(`${base()}/perfil?cambiar-clave=1`);
+        return;
+    }
     const categorias = $('#categorias');
-    if (categorias) {
-        categorias.innerHTML = datos.categorias.map((categoria) =>
+    const opcionesCategorias = datos.categorias.map((categoria) =>
             `<option value="${Number(categoria.id_categoria)}">${escapar(categoria.nombre)}</option>`
         ).join('');
-    }
+    if (categorias) categorias.innerHTML = opcionesCategorias;
+    const categoriaReporte = $('#categoria-reporte');
+    if (categoriaReporte) categoriaReporte.innerHTML = '<option value="0">Todas</option>' + opcionesCategorias;
     if (estado.usuario && $('#acceso')?.open) $('#acceso').close();
     await navegar();
 }

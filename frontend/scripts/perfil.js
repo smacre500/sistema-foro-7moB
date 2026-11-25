@@ -12,7 +12,11 @@ export async function cargarPerfil(identificador) {
     $('#datos-perfil').innerHTML = `<h1>${escapar(perfil.nombre)}</h1><p class="secundario">@${escapar(perfil.nombre_usuario)}</p><p class="contenido">${escapar(perfil.biografia || 'Sin descripción.')}</p><small class="secundario">Miembro desde ${escapar(fecha(perfil.fecha_registro))}</small>`;
 
     const propio = Number(estado.usuario?.id_usuario) === Number(perfil.id_usuario);
-    $('#editar-perfil').hidden = !propio;
+    const debeCambiarClave = Boolean(estado.usuario?.debe_cambiar_clave);
+    $('#editar-perfil').hidden = !propio || debeCambiarClave;
+    $('#seguridad-cuenta').hidden = !propio;
+    $('#aviso-clave-temporal').hidden = !propio || !debeCambiarClave;
+    $('#form-cambiar-correo').hidden = debeCambiarClave;
     if (propio) {
         $('#form-perfil').elements.nombre.value = perfil.nombre;
         $('#form-perfil').elements.biografia.value = perfil.biografia;

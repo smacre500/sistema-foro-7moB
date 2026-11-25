@@ -546,6 +546,28 @@ summary {
     margin-top: 14px;
 }
 
+.paginacion {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    margin: 18px 0 26px;
+    font-size: 14px;
+}
+
+.paginacion a,
+.paginacion span {
+    padding: 7px 11px;
+    border-radius: 7px;
+    background: #edf2f7;
+}
+
+.paginacion [aria-disabled="true"] { color: var(--gris); }
+.formulario-filtros { grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); align-items: end; margin-bottom: 22px; }
+.error-formulario { color: #a33d45; font-size: 13px; margin: 0; }
+#form-cambiar-clave, #form-cambiar-correo, #form-dar-baja { border-top: 1px solid var(--borde); padding-top: 16px; }
+#form-dar-baja input[type="checkbox"] { width: auto; }
+
 .cabecera-admin {
     margin-bottom: 20px;
 }
@@ -783,6 +805,13 @@ summary {
     padding: 7px 11px;
     font-size: 12px;
     white-space: nowrap;
+}
+
+.acciones-tabla {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 6px;
 }
 
 .tabla-usuarios .vacio {

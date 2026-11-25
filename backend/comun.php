@@ -46,6 +46,90 @@ function correoInstitucional($correo) {
         strrchr(strtolower($correo), '@') === '@obralapiedad.com.ar';
 }
 
+function leerEstadoLocal() {
+    $ruta = __DIR__ . '/storage/estado-cuentas.json';
+    if (!is_file($ruta)) return ['usuarios' => [], 'tokens' => []];
+    $archivo = fopen($ruta, 'rb');
+    if (!$archivo) error('No se pudo leer el almacenamiento local.', 500);
+    flock($archivo, LOCK_SH);
+    $estado = json_decode(stream_get_contents($archivo), true);
+    flock($archivo, LOCK_UN);
+    fclose($archivo);
+    return is_array($estado) ? array_merge(['usuarios' => [], 'tokens' => []], $estado) : ['usuarios' => [], 'tokens' => []];
+}
+
+function modificarEstadoLocal($cambio) {
+    $ruta = __DIR__ . '/storage/estado-cuentas.json';
+    $archivo = fopen($ruta, 'c+');
+    if (!$archivo) error('No se pudo guardar el almacenamiento local. Revisá los permisos de backend/storage.', 500);
+    flock($archivo, LOCK_EX);
+    rewind($archivo);
+    $estado = json_decode(stream_get_contents($archivo), true);
+    if (!is_array($estado)) $estado = ['usuarios' => [], 'tokens' => []];
+    $resultado = $cambio($estado);
+    rewind($archivo);
+    ftruncate($archivo, 0);
+    fwrite($archivo, json_encode($estado, JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR));
+    fflush($archivo);
+    flock($archivo, LOCK_UN);
+    fclose($archivo);
+    return $resultado;
+}
+
+function datosCuentaLocal($idUsuario) {
+    $estado = leerEstadoLocal();
+    return $estado['usuarios'][(string) $idUsuario] ?? [];
+}
+
+function correoCuenta($idUsuario, $correoBase) {
+    return datosCuentaLocal($idUsuario)['correo'] ?? $correoBase;
+}
+
+function cuentaActiva($idUsuario) {
+    return (datosCuentaLocal($idUsuario)['activa'] ?? true) === true;
+}
+
+function versionSesionCuenta($idUsuario) {
+    return (int) (datosCuentaLocal($idUsuario)['version_sesion'] ?? 1);
+}
+
+function claveCuenta($idUsuario, $claveBase) {
+    return datosCuentaLocal($idUsuario)['contrasena_hash'] ?? $claveBase;
+}
+
+function buscarCorreoLocal($correo) {
+    $estado = leerEstadoLocal();
+    foreach ($estado['usuarios'] as $idUsuario => $datos) {
+        if (!empty($datos['correo']) && strtolower($datos['correo']) === strtolower($correo)) {
+            return (int) $idUsuario;
+        }
+    }
+    return null;
+}
+
+function registrarEliminacionLocal($registro) {
+    $ruta = __DIR__ . '/storage/eliminaciones.jsonl';
+    $archivo = fopen($ruta, 'ab');
+    if (!$archivo) error('No se pudo registrar la eliminación. No se borró el contenido.', 500);
+    flock($archivo, LOCK_EX);
+    fwrite($archivo, json_encode($registro, JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR) . PHP_EOL);
+    fflush($archivo);
+    flock($archivo, LOCK_UN);
+    fclose($archivo);
+}
+
+function eliminacionesLocales($desde, $hasta) {
+    $ruta = __DIR__ . '/storage/eliminaciones.jsonl';
+    if (!is_file($ruta)) return [];
+    $lineas = file($ruta, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+    $registros = [];
+    foreach ($lineas as $linea) {
+        $dato = json_decode($linea, true);
+        if (is_array($dato) && ($dato['fecha'] ?? '') >= $desde && ($dato['fecha'] ?? '') < $hasta) $registros[] = $dato;
+    }
+    return array_slice(array_reverse($registros), 0, 50);
+}
+
 function baneoActivo($usuario) {
     return consulta(
         'SELECT * FROM baneos WHERE id_usuario=? AND activo=1 AND fecha_inicio<=UTC_TIMESTAMP() AND (fecha_fin IS NULL OR fecha_fin>UTC_TIMESTAMP()) ORDER BY id_baneo DESC LIMIT 1',
@@ -71,6 +155,29 @@ function usuarioActual($obligatorio = false) {
         }
         return null;
     }
+    if (!cuentaActiva($usuario['id_usuario']) || (int) ($_SESSION['version_sesion'] ?? 0) !== versionSesionCuenta($usuario['id_usuario'])) {
+        unset($_SESSION['usuario'], $_SESSION['version_sesion']);
+        if ($obligatorio) error('La sesión venció o la cuenta fue desactivada. Iniciá sesión nuevamente.', 401);
+        return null;
+    }
+    $datosLocales = datosCuentaLocal($usuario['id_usuario']);
+    $usuario['debe_cambiar_clave'] = ($datosLocales['debe_cambiar_clave'] ?? false) === true;
+    if ($usuario['debe_cambiar_clave']) {
+        $script = basename($_SERVER['SCRIPT_NAME'] ?? '');
+        $permitidos = ['inicio.php', 'perfil.php', 'cambiar_clave.php', 'salir.php'];
+        if (!in_array($script, $permitidos, true)) {
+            error('Antes de continuar, cambiá la contraseña temporal desde tu perfil.', 403);
+        }
+        if ($script === 'perfil.php') {
+            $nombreSolicitado = $_GET['username'] ?? null;
+            $idSolicitado = $_GET['id'] ?? null;
+            $propio = ($nombreSolicitado === null && $idSolicitado === null)
+                || ($nombreSolicitado === $usuario['nombre_usuario'])
+                || ((string) $idSolicitado === (string) $usuario['id_usuario']);
+            if (!$propio) error('Antes de continuar, cambiá la contraseña temporal desde tu perfil.', 403);
+        }
+    }
+    $usuario['correo'] = correoCuenta($usuario['id_usuario'], $usuario['correo']);
     if (!correoInstitucional($usuario['correo'])) {
         unset($_SESSION['usuario']);
         error('Tu cuenta no tiene acceso al foro. Revisá el correo institucional o consultá al administrador.', 403);
@@ -96,13 +203,17 @@ function datosPost() {
     if (($_SERVER['REQUEST_METHOD'] ?? '') != 'POST') {
         error('Método no permitido.', 405);
     }
-    if ((int) ($_SERVER['CONTENT_LENGTH'] ?? 0) > 20000) {
+    if ((int) ($_SERVER['CONTENT_LENGTH'] ?? 0) > 1048576) {
         error('El contenido es demasiado grande.', 413);
     }
     if (!hash_equals($_SESSION['csrf'], $_SERVER['HTTP_X_CSRF_TOKEN'] ?? '')) {
         error('Recargá la página y volvé a intentarlo.', 419);
     }
-    $datos = json_decode(file_get_contents('php://input'), true);
+    $cuerpo = file_get_contents('php://input');
+    if (strlen($cuerpo) > 1048576) {
+        error('El contenido es demasiado grande.', 413);
+    }
+    $datos = json_decode($cuerpo, true);
     if (!is_array($datos)) {
         error('Datos inválidos.');
     }
