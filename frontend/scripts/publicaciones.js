@@ -2,7 +2,7 @@ import { estado, esAdmin, esBaneado, esPropio } from './estado.js';
 import { $, escapar, fecha, iniciales } from './util.js';
 import { api } from './api.js';
 
-export function dibujarPublicacion(publicacion) {
+export function dibujarPublicacion(publicacion, comentariosAbiertos) {
     const identificador = Number(publicacion.id_publicacion);
     const comentarios = (publicacion.comentarios || [])
         .map(
@@ -15,7 +15,7 @@ export function dibujarPublicacion(publicacion) {
         <div class="cabecera-publicacion"><div class="avatar" aria-hidden="true">${escapar(iniciales(publicacion.nombre))}</div><div class="datos-autor"><div class="linea-autor"><a class="autor-nombre" href="${document.body.dataset.base || ''}/perfil/${encodeURIComponent(publicacion.nombre_usuario)}">${escapar(publicacion.nombre)}</a><span class="autor-usuario">@${escapar(publicacion.nombre_usuario)}</span><span class="autor-fecha">· ${escapar(fecha(publicacion.fecha_publicacion))}</span></div></div><span class="categoria">${escapar(publicacion.categoria)}</span></div>
         <h3>${escapar(publicacion.titulo)}</h3><p class="contenido">${escapar(publicacion.contenido)}</p>
         <div class="acciones pie-publicacion"><button class="me-gusta ${Number(publicacion.mi_like) ? 'activo' : ''}" data-accion="me-gusta" data-id="${identificador}" aria-pressed="${Boolean(Number(publicacion.mi_like))}">♡ Me gusta (${Number(publicacion.likes)})</button>${esPropio(publicacion) ? `<button class="enlace" data-accion="editar-publicacion" data-id="${identificador}">Editar</button>` : ''}${esPropio(publicacion) || esAdmin() ? `<button class="enlace" data-accion="eliminar-publicacion" data-id="${identificador}">Eliminar</button>` : ''}</div>
-        <details><summary>Comentarios (${(publicacion.comentarios || []).length})</summary>${comentarios || '<p class="secundario">Todavía no hay comentarios.</p>'}${estado.usuario ? (esBaneado() ? '<p class="secundario">Tu cuenta está suspendida: no podés comentar.</p>' : `<form class="form-comentario" data-publicacion="${identificador}"><label>Tu comentario<textarea name="contenido" rows="2" maxlength="2000" required></textarea></label><button type="submit">Comentar</button></form>`) : '<p class="secundario">Iniciá sesión para comentar.</p>'}</details>
+        <details data-publicacion="${identificador}"${comentariosAbiertos ? ' open' : ''}><summary>Comentarios (${(publicacion.comentarios || []).length})</summary>${comentarios || '<p class="secundario">Todavía no hay comentarios.</p>'}${estado.usuario ? (esBaneado() ? '<p class="secundario">Tu cuenta está suspendida: no podés comentar.</p>' : `<form class="form-comentario" data-publicacion="${identificador}"><label>Tu comentario<textarea name="contenido" rows="2" maxlength="2000" required></textarea></label><button type="submit">Comentar</button></form>`) : '<p class="secundario">Iniciá sesión para comentar.</p>'}</details>
     </article>`;
 }
 function dibujarPaginacion(autor, pagina, hayMas) {
@@ -41,9 +41,14 @@ export async function cargarPublicaciones(autor = 0, paginaSolicitada = null) {
     estado.publicaciones = datos.publicaciones;
     estado.pagina = datos.pagina;
 
-    const contenedor = autor ? '#publicaciones-perfil' : '#publicaciones';
-    $(contenedor).innerHTML =
-        datos.publicaciones.map(dibujarPublicacion).join('') ||
+    const contenedor = $(autor ? '#publicaciones-perfil' : '#publicaciones');
+    const abiertos = new Set(
+        Array.from(contenedor.querySelectorAll('details[open]'), (detalle) => detalle.dataset.publicacion)
+    );
+    contenedor.innerHTML =
+        datos.publicaciones.map((publicacion) =>
+            dibujarPublicacion(publicacion, abiertos.has(String(publicacion.id_publicacion)))
+        ).join('') ||
         '<div class="tarjeta vacio">No hay publicaciones para mostrar.</div>';
 
     if (!autor) {
