@@ -11,6 +11,7 @@ const rutas = {
     publicacion: 'publicacion.php',
     reportes: 'reportes.php',
     cambiar_clave: 'cambiar_clave.php',
+    cambiar_correo: 'cambiar_correo.php',
     dar_baja: 'dar_baja.php',
     publicar: 'publicar.php',
     comentar: 'comentar.php',

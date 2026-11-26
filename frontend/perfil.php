@@ -9,6 +9,12 @@
             <section class="tarjeta" id="seguridad-cuenta" hidden><h2>Seguridad de la cuenta</h2>
                 <p id="aviso-clave-temporal" class="secundario" hidden>Estás usando una contraseña temporal. Cambiala ahora para continuar usando el foro.</p>
                 <form id="form-cambiar-clave"><label>Contraseña actual<input type="password" name="actual" autocomplete="current-password" required></label><label>Nueva contraseña<input type="password" name="nueva" minlength="10" maxlength="72" autocomplete="new-password" required></label><button type="submit">Cambiar contraseña</button></form>
+                <form id="form-cambiar-correo">
+                    <p class="secundario">Correo actual <span id="correo-actual"></span></p>
+                    <label>Nuevo correo institucional<input type="email" name="correo" maxlength="190" autocomplete="email" required></label>
+                    <label>Contraseña actual<input type="password" name="actual" autocomplete="current-password" required></label>
+                    <button type="submit">Cambiar correo</button>
+                </form>
                 <form id="form-dar-baja"><label>Confirmá tu contraseña<input type="password" name="contrasena" autocomplete="current-password" required></label><label><span><input type="checkbox" name="confirmar" value="si" required> Entiendo que mi cuenta quedará desactivada.</span></label><button type="submit" class="peligro">Dar de baja mi cuenta</button></form>
             </section>
             <section id="actividad-perfil" hidden>

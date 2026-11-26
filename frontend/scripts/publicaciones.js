@@ -82,6 +82,7 @@ export async function editarComentario(id) {
     const formulario = dialogo.querySelector('form');
     formulario.elements.id_comentario.value = id;
     formulario.elements.contenido.value = comentario.contenido;
+    formulario.querySelector('.error-formulario').textContent = '';
     dialogo.showModal();
     formulario.elements.contenido.focus();
 }
@@ -104,7 +105,10 @@ export async function eliminarContenido(tipo, id) {
     formulario.elements.tipo.value = tipo;
     formulario.elements.id.value = id;
     formulario.elements.motivo.value = '';
-    $('#campo-motivo-eliminacion').hidden = esMio || !esAdmin();
+    formulario.querySelector('.error-formulario').textContent = '';
+    const requiereMotivo = !esMio && esAdmin();
+    formulario.elements.motivo.required = requiereMotivo;
+    $('#campo-motivo-eliminacion').hidden = !requiereMotivo;
     if (!dialogo.open) dialogo.showModal();
 }
 

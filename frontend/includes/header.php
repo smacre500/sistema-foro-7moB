@@ -17,7 +17,7 @@ function e($valor) { return htmlspecialchars((string) $valor, ENT_QUOTES, 'UTF-8
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Foro Institucional</title>
     <link rel="stylesheet" href="<?= e($base) ?>/frontend/estilos.css?v=20261124-recuperacion-local">
-    <script type="module" src="<?= e($base) ?>/frontend/scripts/main.js?v=20261124-recuperacion-local"></script>
+    <script type="module" src="<?= e($base) ?>/frontend/scripts/main.js"></script>
 </head>
 <body data-pagina="<?= e($pagina) ?>" data-base="<?= e($base) ?>" data-username="<?= e($_GET['username'] ?? '') ?>">
 <header>

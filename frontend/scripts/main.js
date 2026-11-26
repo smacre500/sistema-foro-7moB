@@ -66,6 +66,10 @@ if ($('#form-cambiar-clave')) guardarFormulario('#form-cambiar-clave', async (da
     await api('cambiar_clave', datos);
     location.href = `${document.body.dataset.base || ''}/inicio?mensaje=sesion`;
 });
+if ($('#form-cambiar-correo')) guardarFormulario('#form-cambiar-correo', async (datos) => {
+    await api('cambiar_correo', datos);
+    location.href = `${document.body.dataset.base || ''}/inicio?mensaje=sesion`;
+});
 if ($('#form-dar-baja')) guardarFormulario('#form-dar-baja', async (datos) => {
     await api('dar_baja', datos);
     location.href = `${document.body.dataset.base || ''}/inicio?mensaje=baja`;
