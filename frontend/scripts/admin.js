@@ -75,7 +75,7 @@ export async function cargarReportes(datosFormulario = null) {
         ? `<ol>${datos.mas_gustadas.map((fila) => `<li>${escapar(fila.titulo)} (${escapar(fila.categoria)}): ${Number(fila.me_gusta)} me gusta</li>`).join('')}</ol>`
         : '<p class="secundario">No hay publicaciones en ese período.</p>';
     $('#reporte-eliminaciones').innerHTML = datos.eliminaciones.length
-        ? `<ul>${datos.eliminaciones.map((fila) => `<li>${escapar(fila.tipo)} #${Number(fila.id_contenido)} · ${escapar(fecha(fila.fecha))} · ${escapar(fila.motivo)}</li>`).join('')}</ul>`
+        ? `<ul>${datos.eliminaciones.map((fila) => `<li>${escapar(fila.tipo)} #${Number(fila.id_contenido)} · ${escapar(fila.categoria)} · @${escapar(fila.actor)} · ${escapar(fecha(fila.fecha))} · ${escapar(fila.motivo)}</li>`).join('')}</ul>`
         : '<p class="secundario">No hay eliminaciones en ese período.</p>';
     $('#error-reportes').textContent = '';
 }

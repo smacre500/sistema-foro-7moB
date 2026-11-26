@@ -12,6 +12,10 @@ function responder($datos, $estado = 200) {
 }
 
 function error($mensaje, $estado = 400) {
+    global $pdo;
+    if ($pdo && $pdo->inTransaction()) {
+        $pdo->rollBack();
+    }
     responder(['ok' => false, 'error' => $mensaje], $estado);
 }
 
@@ -46,91 +50,34 @@ function correoInstitucional($correo) {
         strrchr(strtolower($correo), '@') === '@obralapiedad.com.ar';
 }
 
-function leerEstadoLocal() {
-    $ruta = __DIR__ . '/storage/estado-cuentas.json';
-    if (!is_file($ruta)) return ['usuarios' => [], 'tokens' => []];
-    $archivo = fopen($ruta, 'rb');
-    if (!$archivo) error('No se pudo leer el almacenamiento local.', 500);
-    flock($archivo, LOCK_SH);
-    $estado = json_decode(stream_get_contents($archivo), true);
-    flock($archivo, LOCK_UN);
-    fclose($archivo);
-    return is_array($estado) ? array_merge(['usuarios' => [], 'tokens' => []], $estado) : ['usuarios' => [], 'tokens' => []];
+function bloquearPublicacion($idPublicacion) {
+    return consulta(
+        'SELECT id_publicacion,id_autor,id_categoria FROM publicaciones
+         WHERE id_publicacion=? AND fecha_eliminacion IS NULL FOR UPDATE',
+        [$idPublicacion]
+    )->fetch();
 }
 
-function modificarEstadoLocal($cambio) {
-    $ruta = __DIR__ . '/storage/estado-cuentas.json';
-    $archivo = fopen($ruta, 'c+');
-    if (!$archivo) error('No se pudo guardar el almacenamiento local. Revisá los permisos de backend/storage.', 500);
-    flock($archivo, LOCK_EX);
-    rewind($archivo);
-    $estado = json_decode(stream_get_contents($archivo), true);
-    if (!is_array($estado)) $estado = ['usuarios' => [], 'tokens' => []];
-    $resultado = $cambio($estado);
-    rewind($archivo);
-    ftruncate($archivo, 0);
-    fwrite($archivo, json_encode($estado, JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR));
-    fflush($archivo);
-    flock($archivo, LOCK_UN);
-    fclose($archivo);
-    return $resultado;
-}
+function bloquearComentario($idComentario) {
+    $idPublicacion = consulta(
+        'SELECT id_publicacion FROM comentarios WHERE id_comentario=?',
+        [$idComentario]
+    )->fetchColumn();
 
-function datosCuentaLocal($idUsuario) {
-    $estado = leerEstadoLocal();
-    return $estado['usuarios'][(string) $idUsuario] ?? [];
-}
-
-function correoCuenta($idUsuario, $correoBase) {
-    return datosCuentaLocal($idUsuario)['correo'] ?? $correoBase;
-}
-
-function cuentaActiva($idUsuario) {
-    return (datosCuentaLocal($idUsuario)['activa'] ?? true) === true;
-}
-
-function versionSesionCuenta($idUsuario) {
-    return (int) (datosCuentaLocal($idUsuario)['version_sesion'] ?? 1);
-}
-
-function claveCuenta($idUsuario, $claveBase) {
-    return datosCuentaLocal($idUsuario)['contrasena_hash'] ?? $claveBase;
-}
-
-function buscarCorreoLocal($correo) {
-    $estado = leerEstadoLocal();
-    foreach ($estado['usuarios'] as $idUsuario => $datos) {
-        if (!empty($datos['correo']) && strtolower($datos['correo']) === strtolower($correo)) {
-            return (int) $idUsuario;
-        }
+    $publicacion = $idPublicacion ? bloquearPublicacion($idPublicacion) : false;
+    if (!$publicacion) {
+        return false;
     }
-    return null;
-}
 
-function registrarEliminacionLocal($registro) {
-    $ruta = __DIR__ . '/storage/eliminaciones.jsonl';
-    $archivo = fopen($ruta, 'ab');
-    if (!$archivo) error('No se pudo registrar la eliminación. No se borró el contenido.', 500);
-    flock($archivo, LOCK_EX);
-    fwrite($archivo, json_encode($registro, JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR) . PHP_EOL);
-    fflush($archivo);
-    flock($archivo, LOCK_UN);
-    fclose($archivo);
-}
-
-function eliminacionesLocales($desde, $hasta, $categoria) {
-    $ruta = __DIR__ . '/storage/eliminaciones.jsonl';
-    if (!is_file($ruta)) return [];
-    $lineas = file($ruta, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
-    $registros = [];
-    foreach ($lineas as $linea) {
-        $dato = json_decode($linea, true);
-        if (is_array($dato) && ($dato['fecha'] ?? '') >= $desde && ($dato['fecha'] ?? '') < $hasta
-            && ($categoria === 0 || (int) ($dato['id_categoria'] ?? 0) === $categoria)) {
-            $registros[] = $dato;
-        }
+    $comentario = consulta(
+        'SELECT id_comentario,id_autor FROM comentarios
+         WHERE id_comentario=? AND fecha_eliminacion IS NULL FOR UPDATE',
+        [$idComentario]
+    )->fetch();
+    if ($comentario) {
+        $comentario['id_categoria'] = $publicacion['id_categoria'];
     }
-    return array_slice(array_reverse($registros), 0, 50);
+    return $comentario;
 }
 
 function baneoActivo($usuario) {
@@ -148,7 +95,8 @@ function usuarioActual($obligatorio = false) {
         return null;
     }
     $usuario = consulta(
-        'SELECT id_usuario,nombre,nombre_usuario,correo,rol,biografia,fecha_registro FROM usuarios WHERE id_usuario=?',
+        'SELECT id_usuario,nombre,nombre_usuario,correo,rol,biografia,fecha_registro,fecha_baja,version_sesion,debe_cambiar_clave
+         FROM usuarios WHERE id_usuario=?',
         [$_SESSION['usuario']]
     )->fetch();
     if (!$usuario) {
@@ -158,13 +106,13 @@ function usuarioActual($obligatorio = false) {
         }
         return null;
     }
-    if (!cuentaActiva($usuario['id_usuario']) || (int) ($_SESSION['version_sesion'] ?? 0) !== versionSesionCuenta($usuario['id_usuario'])) {
+    if ($usuario['fecha_baja'] !== null || (int) ($_SESSION['version_sesion'] ?? 0) !== (int) $usuario['version_sesion']) {
         unset($_SESSION['usuario'], $_SESSION['version_sesion']);
         if ($obligatorio) error('La sesión venció o la cuenta fue desactivada. Iniciá sesión nuevamente.', 401);
         return null;
     }
-    $datosLocales = datosCuentaLocal($usuario['id_usuario']);
-    $usuario['debe_cambiar_clave'] = ($datosLocales['debe_cambiar_clave'] ?? false) === true;
+    unset($usuario['fecha_baja'], $usuario['version_sesion']);
+    $usuario['debe_cambiar_clave'] = (bool) $usuario['debe_cambiar_clave'];
     if ($usuario['debe_cambiar_clave']) {
         $script = basename($_SERVER['SCRIPT_NAME'] ?? '');
         $permitidos = ['inicio.php', 'perfil.php', 'cambiar_clave.php', 'salir.php'];
@@ -173,14 +121,13 @@ function usuarioActual($obligatorio = false) {
         }
         if ($script === 'perfil.php') {
             $nombreSolicitado = $_GET['username'] ?? null;
-            $idSolicitado = $_GET['id'] ?? null;
-            $propio = ($nombreSolicitado === null && $idSolicitado === null)
-                || ($nombreSolicitado === $usuario['nombre_usuario'])
-                || ((string) $idSolicitado === (string) $usuario['id_usuario']);
+            $idSolicitado = $_GET['id'] ?? $usuario['id_usuario'];
+            $propio = $nombreSolicitado !== null
+                ? is_string($nombreSolicitado) && strcasecmp($nombreSolicitado, $usuario['nombre_usuario']) === 0
+                : !is_array($idSolicitado) && (string) $idSolicitado === (string) $usuario['id_usuario'];
             if (!$propio) error('Antes de continuar, cambiá la contraseña temporal desde tu perfil.', 403);
         }
     }
-    $usuario['correo'] = correoCuenta($usuario['id_usuario'], $usuario['correo']);
     if (!correoInstitucional($usuario['correo'])) {
         unset($_SESSION['usuario']);
         error('Tu cuenta no tiene acceso al foro. Revisá el correo institucional o consultá al administrador.', 403);
@@ -212,7 +159,7 @@ function datosPost() {
     if (!hash_equals($_SESSION['csrf'], $_SERVER['HTTP_X_CSRF_TOKEN'] ?? '')) {
         error('Recargá la página y volvé a intentarlo.', 403);
     }
-    $cuerpo = file_get_contents('php://input');
+    $cuerpo = file_get_contents('php://input', false, null, 0, 1048577);
     if (strlen($cuerpo) > 1048576) {
         error('El contenido es demasiado grande.', 413);
     }
@@ -224,10 +171,6 @@ function datosPost() {
 }
 
 set_exception_handler(function ($e) {
-    global $pdo;
-    if ($pdo && $pdo->inTransaction()) {
-        $pdo->rollBack();
-    }
     error_log('Foro: ' . $e->getMessage());
     error('No se pudo completar la operación.', 500);
 });

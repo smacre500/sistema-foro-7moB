@@ -16,15 +16,16 @@ if (!correoInstitucional($correo)) {
 if (!is_string($clave) || strlen($clave) < 10 || strlen($clave) > 72) {
     error('La contraseña debe tener entre 10 y 72 bytes.');
 }
-if (consulta('SELECT id_usuario FROM usuarios WHERE correo=? OR nombre_usuario=?', [$correo, $alias])->fetch() || buscarCorreoLocal($correo)) {
+try {
+    consulta(
+        "INSERT INTO usuarios(nombre,nombre_usuario,correo,contrasena_hash,rol) VALUES (?,?,?,?,'usuario')",
+        [$nombre, $alias, $correo, password_hash($clave, PASSWORD_DEFAULT)]
+    );
+} catch (PDOException $e) {
+    if (($e->errorInfo[1] ?? null) !== 1062) throw $e;
     error('Ese correo o usuario ya está registrado.', 409);
 }
-
-consulta(
-    "INSERT INTO usuarios(nombre,nombre_usuario,correo,contrasena_hash,rol) VALUES (?,?,?,?,'usuario')",
-    [$nombre, $alias, $correo, password_hash($clave, PASSWORD_DEFAULT)]
-);
 $_SESSION['usuario'] = (int) $pdo->lastInsertId();
-$_SESSION['version_sesion'] = versionSesionCuenta($_SESSION['usuario']);
+$_SESSION['version_sesion'] = 1;
 session_regenerate_id(true);
 responder(['ok' => true]);

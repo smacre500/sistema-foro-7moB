@@ -2,8 +2,6 @@
 
 Aplicación web de foro para una comunidad escolar. Permite compartir publicaciones, comentarlas, darles “Me gusta” y administrar cuentas y contenido.
 
-Las mejoras descritas abajo no requieren cambios al esquema SQL de MySQL.
-
 ## Contenido
 
 - [Tecnologías y requisitos](#tecnologías-y-requisitos)
@@ -14,7 +12,6 @@ Las mejoras descritas abajo no requieren cambios al esquema SQL de MySQL.
 - [Funciones por rol](#funciones-por-rol)
 - [Rutas de la aplicación](#rutas-de-la-aplicación)
 - [API del backend](#api-del-backend)
-- [Datos auxiliares y respaldos](#datos-auxiliares-y-respaldos)
 - [Recuperación de contraseñas sin correo](#recuperación-de-contraseñas-sin-correo)
 - [Correcciones incluidas en esta copia](#correcciones-incluidas-en-esta-copia)
 - [Solución de problemas](#solución-de-problemas)
@@ -34,16 +31,16 @@ En esta computadora, la copia de demostración se ejecuta con PHP 8.2 y MariaDB 
 
 ```text
 .
-├── .gitignore                    # Excluye datos JSON locales de cuentas y auditoría
+├── .gitignore
 ├── .htaccess                    # Rutas cortas y página inicial de Apache
 ├── README.md                    # Esta documentación
 ├── backend/
 │   ├── conn.php                 # Conexión PDO y URL pública del foro
 │   ├── comun.php                # Sesión, CSRF, validaciones y funciones compartidas
-│   ├── *.php                    # Endpoints de la API
-│   └── storage/                 # Estado auxiliar y auditoría en archivos
+│   └── *.php                    # Endpoints de la API
 ├── db/
 │   ├── foro.sql                 # Esquema y categorías iniciales
+│   ├── migracion_moderacion_y_cuentas.sql # Actualiza una base existente
 │   └── insert.sql               # Datos ficticios para demostración
 ├── frontend/
 │   ├── inicio.php               # Inicio y publicaciones
@@ -62,11 +59,10 @@ Los archivos PHP del directorio `backend/` devuelven respuestas JSON y forman la
 
 1. Copiá la carpeta del proyecto dentro de `C:\xampp\htdocs\`, por ejemplo `C:\xampp\htdocs\sistema-foro-7moB`.
 2. Iniciá Apache y MySQL desde el panel de XAMPP.
-3. Revisá que Apache permita `.htaccess`: `mod_rewrite` debe estar activo y la configuración del directorio debe permitir `AllowOverride All`.
+3. En `C:\xampp\apache\conf\httpd.conf`, comprobá que esté activa la línea `LoadModule rewrite_module modules/mod_rewrite.so` y que el bloque `<Directory "C:/xampp/htdocs">` tenga `AllowOverride All`. Reiniciá Apache si cambiaste la configuración.
 4. Configurá la conexión en [`backend/conn.php`](backend/conn.php) según tu instalación de MySQL o MariaDB.
-5. Si es una instalación nueva, creá/importá la base siguiendo [Base de datos](#base-de-datos).
-6. Asegurate de que PHP/Apache pueda escribir dentro de `backend/storage/`.
-7. Abrí `http://localhost/sistema-foro-7moB/inicio`.
+5. Creá o actualizá la base según [Base de datos](#base-de-datos).
+6. Abrí `http://localhost/sistema-foro-7moB/inicio`.
 
 La ruta base depende del nombre de la carpeta en `htdocs`. El `.htaccess` del proyecto define `/inicio`, `/crear`, `/admin` y `/perfil`.
 
@@ -88,10 +84,10 @@ El esquema tiene estas tablas:
 
 | Tabla | Uso |
 |---|---|
-| `usuarios` | Cuentas, hash de contraseña y rol (`usuario` o `administrador`). |
+| `usuarios` | Cuentas, hash de contraseña, rol, baja y versión de sesión. |
 | `categorias` | Categorías de publicaciones. |
-| `publicaciones` | Título, contenido, autor, categoría y fecha. |
-| `comentarios` | Comentarios vinculados con publicaciones y autores. |
+| `publicaciones` | Publicaciones y datos de su eliminación lógica. |
+| `comentarios` | Comentarios vinculados con publicaciones, autores y datos de eliminación lógica. |
 | `likes` | Reacciones de usuarios a publicaciones. |
 | `baneos` | Suspensiones, motivo, duración y administrador que las aplicó. |
 
@@ -99,7 +95,9 @@ El esquema tiene estas tablas:
 
 `db/insert.sql` contiene datos de ejemplo (cuentas, publicaciones, reacciones y sanciones) para una demostración. Usalo una sola vez y solo en una base de prueba, después de importar `foro.sql`, que ya agrega las categorías.
 
-Las correcciones documentadas en esta copia no agregan tablas ni columnas. Las contraseñas temporales, la baja de cuenta y las versiones de sesión auxiliares se manejan con archivos JSON en `backend/storage/`.
+Para actualizar una instalación con datos, exportá primero la base con phpMyAdmin y ejecutá **una vez** `db/migracion_moderacion_y_cuentas.sql`. El script agrega columnas e índices y conserva las filas existentes. Si usás otro nombre de base, ajustá el `USE` del script. Si hay correos o nombres de usuario duplicados, resolvelos antes de importar la migración.
+
+Si una instalación anterior tiene archivos en `backend/storage/`, guardalos fuera de `htdocs` antes de actualizar. La migración SQL no importa esos archivos. Pasá a la base las bajas y cambios de credenciales que estén pendientes de trasladar antes de habilitar el acceso. El archivo de auditoría puede conservarse como respaldo histórico. Una publicación que ya se borró físicamente solo se puede recuperar de un respaldo que contenga su texto.
 
 ## Funciones por rol
 
@@ -123,7 +121,7 @@ Las correcciones documentadas en esta copia no agregan tablas ni columnas. Las c
 - Buscar cuentas, suspenderlas por un período o permanentemente y levantar suspensiones.
 - Restablecer la contraseña de cuentas activas que no estén suspendidas.
 - Consultar reportes por período y categoría: cantidad de publicaciones por categoría, diez publicaciones con más “Me gusta” y eliminaciones recientes.
-- Eliminar contenido ajeno indicando un motivo. Las eliminaciones quedan registradas para auditoría.
+- Eliminar contenido ajeno indicando un motivo. La base conserva el contenido, el autor, quién lo eliminó, la fecha y el motivo. Al ocultar una publicación también se ocultan sus comentarios.
 
 Los permisos se comprueban en el backend; ocultar un botón en la interfaz no reemplaza la validación del servidor.
 
@@ -139,7 +137,7 @@ Los permisos se comprueban en el backend; ocultar un botón en la interfaz no re
 
 ## API del backend
 
-Todos los cambios de estado se envían como `POST` con JSON y token CSRF. La función `api()` de `frontend/scripts/api.js` agrega el token de sesión automáticamente.
+Todos los cambios de estado se envían como `POST` con JSON y token CSRF. La función `api()` de `frontend/scripts/api.js` agrega el token de sesión automáticamente. La API admite hasta 1 MiB por solicitud y hasta 10.000 caracteres por publicación.
 
 | Archivo | Método y propósito |
 |---|---|
@@ -159,24 +157,13 @@ Todos los cambios de estado se envían como `POST` con JSON y token CSRF. La fun
 
 `backend/comun.php` contiene helpers compartidos; no es un endpoint de uso directo.
 
-## Datos auxiliares y respaldos
-
-Los archivos de `backend/storage/` complementan la base sin alterar su esquema:
-
-- `estado-cuentas.json`: hashes auxiliares de contraseñas, datos de cuentas dadas de baja, versiones de sesión y marcas de cambio obligatorio.
-- `eliminaciones.jsonl`: una línea JSON por eliminación, con el tipo, los IDs de categoría, autor y administrador, el motivo y la fecha. Los registros antiguos sin categoría aparecen al seleccionar **Todas**.
-- `.htaccess`: impide que Apache sirva directamente los archivos de almacenamiento.
-- `.gitkeep`: conserva la carpeta en copias donde todavía no se generaron archivos de estado.
-
-Apache/PHP necesita permiso de escritura en esta carpeta. Incluí su contenido en los respaldos junto con MySQL: perder esos JSON puede hacer que falten datos auxiliares de cuentas o auditoría. No publiques ni compartas esos archivos; contienen hashes y datos de sesión/estado. PHP Built-in Server ignora `.htaccess`; si lo usás para desarrollo, mantenelo ligado a `127.0.0.1` y no lo expongas a la red.
-
 ## Recuperación de contraseñas sin correo
 
 La recuperación olvidada no envía emails. El procedimiento es:
 
 1. El administrador verifica en persona la identidad de quien solicita ayuda.
 2. En `/admin`, pulsa **Restablecer contraseña** en la fila de una cuenta activa y confirma.
-3. El servidor genera una clave aleatoria y devuelve el texto solo para mostrarlo una vez. Se guarda únicamente su hash en el almacenamiento JSON local.
+3. El servidor genera una clave aleatoria y la muestra una vez. Guarda su hash en `usuarios` e invalida las sesiones anteriores.
 4. El administrador entrega la clave temporal en persona; no debe enviarla por un canal público ni guardarla en capturas o archivos.
 5. Al iniciar sesión, el usuario es redirigido a su perfil y debe cambiar la clave temporal antes de usar las demás funciones.
 
@@ -188,16 +175,14 @@ Las cuentas suspendidas o dadas de baja no se pueden restablecer desde ese botó
 - Carga conjunta de comentarios para las publicaciones de la página actual.
 - Endpoint individual para cargar una publicación al editarla, con validación de autoría y suspensión.
 - Reportes administrativos por fechas y categoría.
-- Registro auxiliar de eliminaciones y motivo obligatorio cuando el administrador borra contenido ajeno.
-- Edición de comentarios en un diálogo de la interfaz en lugar de `prompt()`.
-- Validación coherente del tamaño del contenido de publicaciones con el límite de la columna SQL existente.
-- Baja lógica de cuentas y cierre/invalidez de sesiones auxiliares sin borrar publicaciones.
+- Eliminación lógica con auditoría en SQL y motivo obligatorio para moderar contenido ajeno.
+- Edición de comentarios en un diálogo de la interfaz.
+- Límite de 1 MiB para el JSON de la solicitud y de 10.000 caracteres para el contenido de una publicación.
+- Baja lógica de cuentas con invalidación de sesiones y conservación de sus aportes.
 - Se quitó la opción de cambiar el correo desde el foro; para iniciar sesión se conserva la dirección registrada.
 - Recuperación por correo eliminada y reemplazada por restablecimiento administrativo con clave temporal y cambio obligatorio.
 - Importación única de módulos JavaScript que antes podían cargarse con URLs distintas.
 - Retiro del endpoint antiguo de publicaciones que ya no se usaba.
-
-Los cambios descritos conservan el esquema de `db/foro.sql`.
 
 ## Solución de problemas
 
@@ -206,7 +191,7 @@ Los cambios descritos conservan el esquema de `db/foro.sql`.
 | Error de conexión a MySQL | Que MySQL/MariaDB esté iniciado, que la base exista y que host, puerto, base y credenciales de `backend/conn.php` coincidan. Verificá también `pdo_mysql`. |
 | `/inicio` funciona, pero `/admin` o `/perfil` da 404 | Activá `mod_rewrite`, habilitá `AllowOverride All` y reiniciá Apache. Comprobá que `.htaccess` esté en la raíz del proyecto. |
 | Error de CSRF o aviso para recargar | Habilitá sesiones persistentes de PHP y verificá permisos de escritura en la carpeta configurada como `session.save_path`. El navegador y la API deben usar el mismo host y puerto. |
-| No se puede guardar un cambio de cuenta o auditoría | Revisá permisos de escritura en `backend/storage/` y que Apache pueda acceder a esa ruta. |
+| Fallan las consultas después de actualizar | Revisá que se haya aplicado la migración en la base configurada en `conn.php`. |
 | La clave temporal no deja entrar | Verificá que se esté usando el nombre de usuario exacto y la clave mostrada al administrador; cada restablecimiento reemplaza la anterior. Si ya se cerró el aviso, el administrador debe generar otra. |
 
 ## Capturas de pantalla

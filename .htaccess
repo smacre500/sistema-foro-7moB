@@ -1,6 +1,7 @@
 Options -Indexes
 DirectoryIndex frontend/inicio.php
 RewriteEngine On
+RewriteRule ^backend/storage(?:/|$) - [F,NC]
 
 RewriteRule ^inicio/?$ frontend/inicio.php [L,QSA]
 RewriteRule ^crear/?$ frontend/crear.php [L,QSA]

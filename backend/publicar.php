@@ -15,7 +15,8 @@ if (!consulta('SELECT id_categoria FROM categorias WHERE id_categoria=?', [$cate
 }
 
 if (!empty($datos['id_publicacion'])) {
-    $publicacion = consulta('SELECT * FROM publicaciones WHERE id_publicacion=?', [id($datos['id_publicacion'])])->fetch();
+    $pdo->beginTransaction();
+    $publicacion = bloquearPublicacion(id($datos['id_publicacion']));
     if (!$publicacion) {
         error('La publicación ya no existe.', 404);
     }
@@ -26,6 +27,7 @@ if (!empty($datos['id_publicacion'])) {
         'UPDATE publicaciones SET titulo=?,contenido=?,id_categoria=? WHERE id_publicacion=?',
         [$titulo, $contenido, $categoria, $publicacion['id_publicacion']]
     );
+    $pdo->commit();
 } else {
     consulta(
         'INSERT INTO publicaciones(id_autor,id_categoria,titulo,contenido) VALUES (?,?,?,?)',

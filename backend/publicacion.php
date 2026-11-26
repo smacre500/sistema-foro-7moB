@@ -14,7 +14,7 @@ $identificador = id($_GET['id'] ?? null);
 $publicacion = consulta(
     'SELECT id_publicacion,id_autor,titulo,contenido,id_categoria
      FROM publicaciones
-     WHERE id_publicacion=?',
+     WHERE id_publicacion=? AND fecha_eliminacion IS NULL',
     [$identificador]
 )->fetch();
 

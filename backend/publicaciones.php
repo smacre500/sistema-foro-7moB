@@ -17,11 +17,13 @@ $limite = 10;
 $offset = ($pagina - 1) * $limite;
 
 $sql =
-    'SELECT p.*,u.nombre,u.nombre_usuario,c.nombre AS categoria,
+    'SELECT p.id_publicacion,p.id_autor,p.id_categoria,p.titulo,p.contenido,p.fecha_publicacion,
+    u.nombre,u.nombre_usuario,c.nombre AS categoria,
     (SELECT COUNT(*) FROM likes WHERE id_publicacion=p.id_publicacion) AS likes,
     (SELECT COUNT(*) FROM likes WHERE id_publicacion=p.id_publicacion AND id_usuario=?) AS mi_like
     FROM publicaciones p JOIN usuarios u ON p.id_autor=u.id_usuario JOIN categorias c ON p.id_categoria=c.id_categoria
-    WHERE (p.titulo LIKE ? OR p.contenido LIKE ? OR u.nombre LIKE ?) AND (?=0 OR p.id_autor=?)
+    WHERE p.fecha_eliminacion IS NULL
+    AND (p.titulo LIKE ? OR p.contenido LIKE ? OR u.nombre LIKE ?) AND (?=0 OR p.id_autor=?)
     ORDER BY p.id_publicacion DESC LIMIT ? OFFSET ?';
 $stmt = $pdo->prepare($sql);
 $parametros = [$miId, $buscar, $buscar, $buscar, $autor, $autor, $limite + 1, $offset];
@@ -40,7 +42,10 @@ $porPublicacion = [];
 if ($ids) {
     $marcas = implode(',', array_fill(0, count($ids), '?'));
     $comentarios = consulta(
-        "SELECT c.*,u.nombre FROM comentarios c JOIN usuarios u ON c.id_autor=u.id_usuario WHERE c.id_publicacion IN ($marcas) ORDER BY c.id_comentario",
+        "SELECT c.id_comentario,c.id_publicacion,c.id_autor,c.contenido,c.fecha_publicacion,u.nombre
+         FROM comentarios c JOIN usuarios u ON c.id_autor=u.id_usuario
+         WHERE c.fecha_eliminacion IS NULL AND c.id_publicacion IN ($marcas)
+         ORDER BY c.id_comentario",
         $ids
     )->fetchAll();
     foreach ($comentarios as $comentario) {

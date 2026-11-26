@@ -37,6 +37,7 @@ $porCategoria = consulta(
        ON p.id_categoria = c.id_categoria
       AND p.fecha_publicacion >= ?
       AND p.fecha_publicacion < ?
+      AND p.fecha_eliminacion IS NULL
      WHERE (? = 0 OR c.id_categoria = ?)
      GROUP BY c.id_categoria, c.nombre
      ORDER BY c.nombre',
@@ -51,6 +52,7 @@ $masGustadas = consulta(
      LEFT JOIN likes l ON l.id_publicacion = p.id_publicacion
      WHERE p.fecha_publicacion >= ?
        AND p.fecha_publicacion < ?
+       AND p.fecha_eliminacion IS NULL
        AND (? = 0 OR p.id_categoria = ?)
      GROUP BY p.id_publicacion, p.titulo, c.nombre
      ORDER BY me_gusta DESC, p.id_publicacion DESC
@@ -58,7 +60,26 @@ $masGustadas = consulta(
     [$desdeUtc, $hastaUtc, $categoria, $categoria]
 )->fetchAll();
 
-$eliminaciones = eliminacionesLocales($desdeUtc, $hastaUtc, $categoria);
+$eliminaciones = consulta(
+    "SELECT e.tipo,e.id_contenido,e.id_autor_original,e.id_actor,e.motivo,e.fecha,
+            u.nombre_usuario AS actor,cat.nombre AS categoria
+     FROM (
+         SELECT 'publicacion' AS tipo,id_publicacion AS id_contenido,id_categoria,
+                id_autor AS id_autor_original,id_eliminado_por AS id_actor,
+                motivo_eliminacion AS motivo,fecha_eliminacion AS fecha
+         FROM publicaciones WHERE fecha_eliminacion >= ? AND fecha_eliminacion < ?
+         UNION ALL
+         SELECT 'comentario',id_comentario,id_categoria_eliminacion,id_autor,id_eliminado_por,
+                motivo_eliminacion,fecha_eliminacion
+         FROM comentarios WHERE fecha_eliminacion >= ? AND fecha_eliminacion < ?
+     ) e
+     JOIN usuarios u ON u.id_usuario=e.id_actor
+     JOIN categorias cat ON cat.id_categoria=e.id_categoria
+     WHERE (? = 0 OR e.id_categoria = ?)
+     ORDER BY e.fecha DESC,e.tipo,e.id_contenido DESC
+     LIMIT 50",
+    [$desdeUtc, $hastaUtc, $desdeUtc, $hastaUtc, $categoria, $categoria]
+)->fetchAll();
 responder([
     'ok' => true,
     'por_categoria' => $porCategoria,
