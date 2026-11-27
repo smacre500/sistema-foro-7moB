@@ -42,7 +42,9 @@ Pagina administración de usuarios, permite buscar y suspender o levantar suspen
 
 Esta página solo esta disponible para administradores (Rol administrador)
 
-![vista panel admin](assets/admin.png)
+![vista panel admin](assets/administracion-1.png)
+
+![vista panel admin](assets/administracion-2.png)
 
 # Estructura de archivos
 
