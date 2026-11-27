@@ -47,5 +47,5 @@ Esta página solo esta disponible para administradores (Rol administrador)
 # Estructura de archivos
 
 - `frontend/`: Incluye todo el frontend con unas reglas usando .htaccess para remover el .php de las páginas para que quede mejor.
-- `db/`: Incluye 3 archivos de base de datos, `foro.sql` es el archivo con solo las tablas, `foro-itlp-limpio.sql` es el archivo inicial que se usaria en la base de datos (limpio pero con categorias puestas) y `insert.sql` tiene datos falsos para probar la página web
+- `db/`: Incluye 2 archivos de base de datos, `foro.sql` es el archivo con solo las tablas y relaciones que se usaria en la base de datos y `insert.sql` tiene datos falsos para probar la página web
 - `backend/`: Api hecha con PHP, cada archivo es un endpoint diferente
