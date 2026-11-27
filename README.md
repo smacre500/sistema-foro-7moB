@@ -38,7 +38,7 @@ Formulario para crear una publicación.
 
 ## Administración
 
-Pagina administración de usuarios, permite buscar y suspender o levantar suspensiones de usuarios.
+Pagina administración de usuarios, restablecer contraseñas, permite buscar y suspender o levantar suspensiones de usuarios.
 
 Esta página solo esta disponible para administradores (Rol administrador)
 
