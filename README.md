@@ -24,6 +24,9 @@ Esta página es reutilizada cuando el usuario busca posts (`?buscar=`).
 Muestra el perfil del usuario y sus posts. Tambien muestra un formulario para editar los datos si el perfil es el mismo que el del usuario logeado.
 ![vista perfil](assets/perfil.png)
 
+Muestra como se puede editar el perfil del usuario
+![vista perfil](assets/editar_perfil.png)
+
 Perfil de otra persona:
 
 ![alt text](assets/perfil_otro.png)
